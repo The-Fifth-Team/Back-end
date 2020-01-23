@@ -18,7 +18,7 @@ var userSchema = mongoose.Schema({
   },
   age: {
     type: Number,
-    require: true,
+    required: true,
   },
   gender: {
     type: String,
@@ -28,7 +28,7 @@ var userSchema = mongoose.Schema({
 })
 
 var User = new mongoose.model('User', userSchema);
-
+module.exports.User = User
 
 /*******************************
  *******************************
