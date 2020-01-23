@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/The-Fifth-Team/Back-end#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
-    "mongoose": "^5.8.9"
+    "mongoose": "^5.8.9",
+    "validator": "^12.1.0"
   }
 }
