@@ -5,26 +5,25 @@ const bcrypt = require('bcryptjs')
 const AdminSchema = mongoose.Schema({
     firstName : {
         type : String,
-        required : [true,"First Name is Required"],
+        required : [true, "First Name is Required"],
         trim : true
     },
     lastName : {
         type : String,
-        required : [true,"Last Name is Required"],
+        required : [true, "Last Name is Required"],
         trim : true
     },
     password : {
         type : String,
-        required : [true,"Password is Required"],
+        required : [true, "Password is Required"],
         trim : true
     },
     email : {
         type : String,
-        required : [true,"First Name is Required"],
-        unique: [true, "Email Most be unique"],
+        required : [true, "First Name is Required"],
         lowercase: true,
         trim : true,
-        validate: [validator.isEmail, 'Must be a valid email']
+        validate: [validator.isEmail, "Must be a valid email"]
     }
 });
 
@@ -54,12 +53,20 @@ module.exports.createAdmin = admin => {
 module.exports.findByIdAdmin = _id => {
     return Admin.findById(_id);
 };
-module.exports.removeAdmin = _id => {
+module.exports.findOneByIdAndRemove = _id => {
     return Admin.findByIdAndRemove(_id)
 };
-module.exports.updateAdmin = (_id, criteriaObject) => {
+module.exports.findOneByIdAndUpdate = (_id, criteriaObject) => {
     return Admin.findByIdAndUpdate(_id, criteriaObject);
 };
+/**
+ * @function findOneAdmin finds a One Admin Only, and return a Promise, with the result in the resolved function of the promise
+ * @param criteriaObject The criteria that you want to search with
+ * @return Promise<any>, that contain the result in the resolved function, or Error in the reject function
+ * */
 module.exports.findOneAdmin = criteriaObject => {
     return Admin.findOne(criteriaObject);
+};
+module.exports.findOneAndUpdate = (criteriaObject, updateCriteriaObject) => {
+    return Admin.findOneAndUpdate(criteriaObject, updateCriteriaObject);
 };

@@ -15,15 +15,20 @@ const Emotion = mongoose.model("Emotion", mongoose.Schema({
     }
 }));
 module.exports.insertMany = arrayOfObjects => {
-    Emotion.insertMany(arrayOfObjects);
+    return Emotion.insertMany(arrayOfObjects);
 };
 module.exports.insertOne = emotion => {
     return Emotion.create(emotion);
 };
-module.exports.removeEmotion = _id => {
+module.exports.removeEmotionById = _id => {
     return Emotion.findByIdAndRemove(_id)
 };
-module.exports.updateEmotion = (_id, criteriaObject) => {
+
+module.exports.removeEmotionsByUserId = userId => {
+    return Emotion.remove({userId});
+};
+
+module.exports.updateEmotionById = (_id, criteriaObject) => {
     return Emotion.findByIdAndUpdate(_id, criteriaObject);
 };
 module.exports.findOneEmotion = criteriaObject => {
@@ -34,4 +39,7 @@ module.exports.findByIdEmotion = _id => {
 };
 module.exports.findAllEmotions = () => {
     return Emotion.find({});
+};
+module.exports.findByUserIdEmotion = userId => {
+    return Emotion.find({userId});
 };
