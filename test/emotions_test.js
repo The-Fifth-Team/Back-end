@@ -106,7 +106,7 @@ describe("", () => {
             assert(false, err);
             done();
         })
-    })
+    });
 
     xit("findByUserIdEmotion", done => {
         Emotions.findByUserIdEmotion({userId:"null"}).then(data => {
