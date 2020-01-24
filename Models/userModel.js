@@ -1,7 +1,7 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 const validator = require('validator');
 
-var userSchema = mongoose.Schema({
+const userSchema = mongoose.Schema({
   firstName: {
     type: String,
     required: true,
@@ -25,10 +25,10 @@ var userSchema = mongoose.Schema({
     required: true,
     trim: true,
   }
-})
+});
 
-var User = new mongoose.model('User', userSchema);
-module.exports.User = User
+const User = new mongoose.model('User', userSchema);
+
 
 /*******************************
  *******************************
@@ -47,26 +47,26 @@ module.exports.User = User
 // but we might add the biometrically so it needs more work!
 module.exports.insertUser = ( userData ) => {
   return User.create(userData);
-}
+};
 
 // Delete user ready to export it recieve user id and delete it from db ..
 module.exports.deleteUser = ( userId ) => {
   return User.findOneAndDelete({ _id: userId })
-}
+};
 
 // This function accept userId, as target and object criteria
 // ex { name: 'Ali jalal' } this will target the user by id
 // and set his name to the object criteria ...
 module.exports.updateUser = (userId, objectCriteria) => {
   return User.findByIdAndUpdate(userId, objectCriteria)
-}
+};
 
 // Retreve user by Id
 module.exports.getUser = ( userId ) => {
   return User.findOne({ _id: userId })
-}
+};
 
 // Retrieve all users
 module.exports.getUsers = () => {
   return User.find()
-}
+};
