@@ -1,1 +1,10 @@
-readMe
+Structure of the App
+
+
+src
+│   server/server.js    # App entry point
+└───GraphQL-controller  # GraphQL controller for app endpoint
+└───config              # Environment variables and configuration
+└───Models              # Database models
+└───services            # All the business logic is here
+└───tests               # All the tests are here
