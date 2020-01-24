@@ -1,13 +1,30 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const { ApolloServer, gql } = require('apollo-server-express')
-const { User, getUsers } = require('../Models/userModel')
+const express = require('express');
+const mongoose = require('mongoose');
+const graphqlHttp = require('express-graphql');
+const { ApolloServer, gql } = require('apollo-server-express');
+const { buildSchema } = require('graphql')
+const { User, getUsers } = require('../Models/userModel');
 
 const app = express();
 
 app.use(express.json())
 
+// app.use('/grpahql', graphqlHttp({
+//   schema: buildSchema(`
+//     schema {
+//       query:
+//       mutation: 
+//     }
+//   `),
+//   rootValue: {
+    
+//   }
+// }), (req, res, next) => {
+
+// })
+
 // GraphQl Part
+// GraphQL-controller
 const typeDefs = gql`
   type Query {
     users: [User!]!
@@ -30,11 +47,20 @@ const typeDefs = gql`
 // server-side logic ... like controller
 const resolvers = {
   Query: {
-    users: () => getUsers()
+    users: () => {
+      return getUsers()
+    }
   },
   Mutation: {
     addUser: (_, { firstName, lastName, password, age, gender } ) => {
-      const user = new User({ firstName, lastName, password, age, gender });
+      const user = new User({
+        firstName, 
+        lastName, 
+        password, 
+        age, 
+        gender
+      });
+      console.log(user)
       return user.save()
     }
   }
@@ -66,5 +92,5 @@ mongoose.connect('mongodb://localhost/the-fifth', {
 
 
 app.listen({ port: 4000 }, () => {
-    console.log(`Server ready at http//localhost:4000${server.graphqlPath}`);
+    console.log(`Server ready at http://localhost:4000${server.graphqlPath}`);
 })

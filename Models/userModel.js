@@ -28,7 +28,7 @@ const userSchema = mongoose.Schema({
 });
 
 const User = new mongoose.model('User', userSchema);
-
+module.exports.User = User
 
 /*******************************
  *******************************
@@ -70,3 +70,4 @@ module.exports.getUser = ( userId ) => {
 module.exports.getUsers = () => {
   return User.find()
 };
+
