@@ -17,7 +17,16 @@ able to express disingenuous facial expression for the whole time.
 Build status
 Build status of continuous integration i.e. travis, appveyor etc. Ex. -
 
-Build Status Windows Build Status
+Structure of the App
+
+src
+│   server/server.js    # App entry point
+└───GraphQL-controller  # GraphQL controller for app endpoint
+└───config              # Environment variables and configuration
+└───Models              # Database models
+└───services            # All the business logic is here
+└───tests               # All the tests are here
+
 
 Code style
 If you're using any code style like xo, standard etc. That will help others while contributing to your project. Ex. -
@@ -61,14 +70,4 @@ Anything else that seems useful
 License
 A short snippet describing the license (MIT, Apache etc)
 
-MIT © Yourname
-
-Structure of the App
-
-src
-│   server/server.js    # App entry point
-└───GraphQL-controller  # GraphQL controller for app endpoint
-└───config              # Environment variables and configuration
-└───Models              # Database models
-└───services            # All the business logic is here
-└───tests               # All the tests are here
+MIT © The-Fifth
