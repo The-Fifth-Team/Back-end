@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const { ApolloServer } = require('apollo-server-express');
 const typeDefs = require('../graphql/schema/index')
 const resolvers = require('../graphql/resolvers/index')
-
+const { deleteUser } = require('../Models/User')
 const app = express();
 
 app.use(express.json());
@@ -24,11 +24,11 @@ mongoose.connect('mongodb://localhost/the-fifth', {
   useNewUrlParser: true,
   useFindAndModify: false
 }, (err) => { 
-    if (err) {
-      console.log('Error while connecting ..' + err)
-    } else {
-      console.log('Connected to Database')
-    }
+  if (err) {
+    console.log('Error while connecting ..' + err)
+  } else {
+    console.log('Connected to Database')
+  }
 });
 // Mongodb connection
 
@@ -36,3 +36,8 @@ mongoose.connect('mongodb://localhost/the-fifth', {
 app.listen({ port: 4000 }, () => {
     console.log(`Server ready at http://localhost:4000${server.graphqlPath}`);
 });
+
+// deleteUser("5e2aca9db6a58a2088043025")
+//   .then(res => {
+//     console.log(res)
+//   })

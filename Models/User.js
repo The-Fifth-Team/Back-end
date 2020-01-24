@@ -51,14 +51,14 @@ module.exports.insertUser = ( userData ) => {
 
 // Delete user ready to export it recieve user id and delete it from db ..
 module.exports.deleteUser = ( userId ) => {
-  return User.findOneAndDelete({ _id: userId })
+  return User.deleteOne( userId )
 };
 
 // This function accept userId, as target and object criteria
 // ex { name: 'Ali jalal' } this will target the user by id
 // and set his name to the object criteria ...
-module.exports.updateUser = (userId, objectCriteria) => {
-  return User.findByIdAndUpdate(userId, objectCriteria)
+module.exports.update = (userId, objectCriteria) => {
+  return User.updateOne({ _id: userId }, { objectCriteria })
 };
 
 // Retreve user by Id
