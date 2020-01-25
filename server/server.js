@@ -22,7 +22,7 @@ mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/the-fifth', {
   useCreateIndex: true,
   useNewUrlParser: true,
-  useFindAndModify: false
+  useFindAndModify: false,
 }, (err) => { 
   if (err) {
     console.log('Error while connecting ..' + err)

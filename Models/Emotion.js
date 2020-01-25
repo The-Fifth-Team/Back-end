@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const moment = require('moment');
 mongoose.Promise = global.Promise;
 
 const Emotion = mongoose.model("Emotion", mongoose.Schema({
@@ -26,6 +27,10 @@ const Emotion = mongoose.model("Emotion", mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
+  },
+  createdAt: {
+    type: String,
+    default: moment().format('L')
   }
 }));
 
@@ -63,4 +68,8 @@ module.exports.findAllEmotions = () => {
 
 module.exports.findByUserIdEmotion = userId => {
   return Emotion.find({userId});
+};
+
+module.exports.filterEmotionsByDate = date => {
+  return Emotion.find({createdAt: date})
 };

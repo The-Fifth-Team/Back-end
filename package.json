@@ -24,6 +24,7 @@
     "express-graphql": "^0.9.0",
     "graphql": "^14.5.8",
     "mocha": "^7.0.0",
+    "moment": "^2.24.0",
     "mongoose": "^5.8.9",
     "validator": "^12.1.0"
   }

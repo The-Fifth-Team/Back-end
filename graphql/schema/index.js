@@ -5,6 +5,7 @@ module.exports = typeDefs = gql`
     users: [User!]!
     admins: [Admin!]!
     emotions: [Emotion!]!
+    filterEmotions(date: String!): [Emotion!]!
   }
 
   type Mutation {
@@ -19,7 +20,6 @@ module.exports = typeDefs = gql`
     addEmotion(neutral: Int, angry: Int, disgust: Int, happy: Int, fear: Int, sad: Int, surprised: Int, userId: String): Emotion
     removeEmotion(_id: String!): Emotion!
     updateEmotion(_id: String!, obj: emotionObj): Emotion
-    
   }
 
   type User {
@@ -49,6 +49,7 @@ module.exports = typeDefs = gql`
     sad: Int
     surprised: Int
     userId: String
+    createdAt: String
   }
   
   input userObj {

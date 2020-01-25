@@ -1,11 +1,11 @@
 const { insertUser, deleteUser, getUsers, updateOneUser } = require('../../Models/User');
 const { createAdmin, findOneByIdAndRemove, findAllAdmins, findOneByIdAndUpdate } = require('../../Models/Admin');
-const { insertOne, removeEmotionById, findAllEmotions, updateEmotionById } = require('../../Models/Emotion');
+const { insertOne, removeEmotionById, findAllEmotions, updateEmotionById, filterEmotionsByDate } = require('../../Models/Emotion');
 
 module.exports = resolvers = {
     Query: {
-      users: () => {
-        return getUsers()
+      users: async () => {
+        return await getUsers()
           .then(result => {
             return result;
           })
@@ -21,7 +21,14 @@ module.exports = resolvers = {
           .catch(err => {
             throw err;
           })
+      },
+      filterEmotions: (_, { date }) => {
+        return filterEmotionsByDate(date)
+          .then(result => {
+            return result
+          })
       }
+      
     },
     
    
@@ -112,5 +119,11 @@ module.exports = resolvers = {
             return err;
           })
       },
+      // filterEmotions: (_, { date }) => {
+      //   return filterEmotionsByDate(date)
+      //     .then(result => {
+      //       return result
+      //     })
+      // }
     }
   };
