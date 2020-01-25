@@ -57,7 +57,7 @@ module.exports.findOneByIdAndRemove = _id => {
     return Admin.findByIdAndRemove(_id)
 };
 module.exports.findOneByIdAndUpdate = (_id, criteriaObject) => {
-    return Admin.findByIdAndUpdate(_id, criteriaObject);
+    return Admin.findByIdAndUpdate({ _id }, criteriaObject);
 };
 /**
  * @function findOneAdmin finds a One Admin Only, and return a Promise, with the result in the resolved function of the promise
@@ -66,6 +66,9 @@ module.exports.findOneByIdAndUpdate = (_id, criteriaObject) => {
  * */
 module.exports.findOneAdmin = criteriaObject => {
     return Admin.findOne(criteriaObject);
+};
+module.exports.findAllAdmins = criteriaObject => {
+    return Admin.find();
 };
 module.exports.findOneAndUpdate = (criteriaObject, updateCriteriaObject) => {
     return Admin.findOneAndUpdate(criteriaObject, updateCriteriaObject);
