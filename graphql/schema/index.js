@@ -15,16 +15,16 @@ module.exports = typeDefs = gql`
   }
   
   input userObj {
-    firstName: String!
-    lastName: String!
-    password: String!
-    age: Int!
-    gender: String!
+    firstName: String
+    lastName: String
+    password: String
+    age: Int
+    gender: String
   }
 
   type Mutation {
     addUser(firstName: String!, lastName: String!, password: String!, age: Int!, gender: String!): User!
     removeUser(userId: String!): User!
-    updateUser(userId: String!, obj: userObj!): User!
+    updateUser(userId: String!, obj: userObj): User
   }
 `;

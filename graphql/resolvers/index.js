@@ -1,4 +1,4 @@
-const { insertUser, deleteUser, getUsers, update, User } = require('../../Models/User');
+const { insertUser, deleteUser, getUsers, updateOneUser, User } = require('../../Models/User');
 
 module.exports =  resolvers = {
     Query: {
@@ -22,17 +22,23 @@ module.exports =  resolvers = {
             console.log(err);
           })
       },
-      removeUser: async ( userId ) => {
+      removeUser: async (_, { userId } ) => {
         return await deleteUser(userId)
           .then(result => {
-            // TODO: show something when user is deleted!
-            // return `${userId} has been deleted!`
+            return result
+          })
+          .catch(err => {
+            return err
           })
       },
-      updateUser: (root, params) => {
-        console.log(root, params)
-        return User.findByIdAndUpdate(        )
-        
+      updateUser: (_, {userId, obj}) => {
+        return updateOneUser(userId, obj)
+          .then(result => {
+            return result;
+          })
+          .catch(err => {
+            throw err;
+          })
       },
     }
   };
