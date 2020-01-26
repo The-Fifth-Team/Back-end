@@ -32,12 +32,6 @@ mongoose.connect('mongodb://localhost/the-fifth', {
 });
 // Mongodb connection
 
-
 app.listen({ port: 4000 }, () => {
     console.log(`Server ready at http://localhost:4000${server.graphqlPath}`);
 });
-
-// deleteUser("5e2aca9db6a58a2088043025")
-//   .then(res => {
-//     console.log(res)
-//   })

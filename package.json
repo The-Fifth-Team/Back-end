@@ -4,7 +4,8 @@
   "description": "Team-five server-side",
   "main": "server/server.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "start": "nodemon server/server"
   },
   "repository": {
     "type": "git",
