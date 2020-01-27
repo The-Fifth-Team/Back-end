@@ -18,7 +18,7 @@ const userSchema = mongoose.Schema({
   },
   age: {
     type: Number,
-    require: true,
+    required: true,
   },
   gender: {
     type: String,
@@ -28,7 +28,6 @@ const userSchema = mongoose.Schema({
 });
 
 const User = new mongoose.model('User', userSchema);
-
 
 /*******************************
  *******************************
@@ -51,14 +50,14 @@ module.exports.insertUser = ( userData ) => {
 
 // Delete user ready to export it recieve user id and delete it from db ..
 module.exports.deleteUser = ( userId ) => {
-  return User.findOneAndDelete({ _id: userId })
+  return User.findByIdAndDelete( userId )
 };
 
 // This function accept userId, as target and object criteria
 // ex { name: 'Ali jalal' } this will target the user by id
 // and set his name to the object criteria ...
-module.exports.updateUser = (userId, objectCriteria) => {
-  return User.findByIdAndUpdate(userId, objectCriteria)
+module.exports.updateOneUser = (userId, objectCriteria) => {
+  return User.findByIdAndUpdate({ _id: userId },  objectCriteria )
 };
 
 // Retreve user by Id
@@ -70,3 +69,4 @@ module.exports.getUser = ( userId ) => {
 module.exports.getUsers = () => {
   return User.find()
 };
+
