@@ -17,8 +17,8 @@ exports.sendMail = async (email,subject,template) => {
             port: 587,
             secure: false,
             auth: {
-                user: process.env.EMAIL,
-                pass: process.env.EMAILPASSWORD
+                user: "automatedemotionanalysissystem@gmail.com", //process.env.EMAIL,
+                pass: "As1234As1234"//process.env.EMAILPASSWORD
             },
             tls:{
                 rejectUnauthorized: false
@@ -26,7 +26,7 @@ exports.sendMail = async (email,subject,template) => {
         });
 
         let info = await transporter.sendMail({
-            from: process.env.EMAIL,
+            from: "automatedemotionanalysissystem@gmail.com",
             to: email,
             subject: subject,
             text: "",
