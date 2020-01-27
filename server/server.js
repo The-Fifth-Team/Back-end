@@ -1,13 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 const { ApolloServer } = require('apollo-server-express');
-const typeDefs = require('../graphql/schema/index')
-const resolvers = require('../graphql/resolvers/index')
-const { deleteUser } = require('../Models/User')
+const typeDefs = require('../graphql/schema/index');
+const resolvers = require('../graphql/resolvers/index');
+const { deleteUser } = require('../Models/User');
 const app = express();
-
 app.use(express.json());
-
+dotenv.config({path: '../config.env'});
 const server = new ApolloServer({
   typeDefs,
   resolvers
