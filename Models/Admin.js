@@ -39,6 +39,11 @@ AdminSchema.pre('save', function(next) {
 
 const Admin = mongoose.model("Admin" ,AdminSchema);
 
+/**
+ * @function createAdmin accepts an admin object, and persists it in the database
+ * @param {object} admin the admin object to added in the database
+ * @return {Promise<object>} Promise which contain the admin added OR error if any occurs
+ * */
 module.exports.createAdmin = admin => {
     return Admin.find(admin).then(data => { // check using email
         if (!data.length) {
@@ -50,9 +55,21 @@ module.exports.createAdmin = admin => {
         }
     })
 };
+
+/**
+ * @function findByIdAdmin finds an admin in the database based on his/her object id
+ * @param _id {string} object_id as a String
+ * @return {Promise<object>} Promise which contain the admin OR error if any occurs
+ * */
 module.exports.findByIdAdmin = _id => {
     return Admin.findById(_id);
 };
+
+/**
+ * @function findOneByIdAndRemove finds an admin in the database based on his/her object id
+ * @param _id {string} object_id as a String
+ * @return {Promise<object>} Promise which contain the admin OR error if any occurs
+ * */
 module.exports.findOneByIdAndRemove = _id => {
     return Admin.findByIdAndRemove(_id)
 };
