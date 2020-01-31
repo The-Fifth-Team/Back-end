@@ -13,11 +13,8 @@ const server = new ApolloServer({
   resolvers
 });
 
-// server will be applied as middleware for all requests
 server.applyMiddleware({ app }); 
 
-
-// Mongodb connection
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/the-fifth', {
   useCreateIndex: true,
@@ -30,8 +27,6 @@ mongoose.connect('mongodb://localhost/the-fifth', {
     console.log('Connected to Database')
   }
 });
-// Mongodb connection
-
 app.listen({ port: 4000 }, () => {
     console.log(`Server ready at http://localhost:4000${server.graphqlPath}`);
 });
