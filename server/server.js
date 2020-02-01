@@ -1,10 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
+
+const app = express();
+
 const { ApolloServer } = require('apollo-server-express');
+const { existsSync, mkdirSync } = require("fs");
+const path = require('path');
+// require('dotenv').config();
 const typeDefs = require('../graphql/schema/index')
 const resolvers = require('../graphql/resolvers/index')
-const { deleteUser } = require('../Models/User')
-const app = express();
+
+existsSync(path.join(__dirname, "../images")) || mkdirSync(path.join(__dirname, "../images"));
 
 app.use(express.json());
 

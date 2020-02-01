@@ -1,6 +1,8 @@
 const { insertUser, deleteUser, getUsers, updateOneUser } = require('../../Models/User');
 const { createAdmin, findOneByIdAndRemove, findAllAdmins, findOneByIdAndUpdate } = require('../../Models/Admin');
 const { insertOne, removeEmotionById, findAllEmotions, updateEmotionById, filterEmotionsByDate } = require('../../Models/Emotion');
+const { createWriteStream } = require("fs");
+const path = require('path');
 
 module.exports = resolvers = {
     Query: {
@@ -124,6 +126,20 @@ module.exports = resolvers = {
       //     .then(result => {
       //       return result
       //     })
-      // }
+      // },
+
+      // Photo Part
+      async uploadPhoto(parent, { photo }) {
+        const { filename, createReadStream } = await photo;
+        const current = path.join(__dirname, "../images", filename);
+        try {
+            const result = await new Promise((resolve, reject) => {
+                createReadStream().pipe(createWriteStream(current))
+                console.log("Upload Complite")
+            });
+        } catch (err) {
+            console.log(err)
+        }
+    }
     }
   };

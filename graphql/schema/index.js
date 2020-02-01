@@ -1,15 +1,21 @@
 const { gql } = require('apollo-server-express');
 
 module.exports = typeDefs = gql`
+  type Photo {
+    filename: String!
+    path: String!
+  }
+
   type Query {
     users: [User!]!
     admins: [Admin!]!
     emotions: [Emotion!]!
     filterEmotions(date: String!): [Emotion!]!
+    allPhotos: [Photo]
   }
 
   type Mutation {
-    addUser(firstName: String!, lastName: String!, password: String!, age: Int!, gender: String!): User!
+    addUser(firstName: String!, lastName: String!, password: String, age: Int!, gender: String!): User!
     removeUser(userId: String!): User!
     updateUser(userId: String!, obj: userObj): User
 
@@ -20,6 +26,8 @@ module.exports = typeDefs = gql`
     addEmotion(neutral: Int, angry: Int, disgust: Int, happy: Int, fear: Int, sad: Int, surprised: Int, userId: String): Emotion
     removeEmotion(_id: String!): Emotion!
     updateEmotion(_id: String!, obj: emotionObj): Emotion
+
+    uploadPhoto(photo: Upload!): Photo!
   }
 
   type User {
