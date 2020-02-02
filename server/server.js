@@ -1,27 +1,37 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const {User} = require('../Models/userModel')
-
+const dotenv = require('dotenv');
+const { ApolloServer } = require('apollo-server-express');
+const typeDefs = require('../graphql/schema/index');
+const resolvers = require('../graphql/resolvers/index');
+const { deleteUser } = require('../Models/User');
 const app = express();
+app.use(express.json());
+dotenv.config({path: '../config.env'});
+const server = new ApolloServer({
+  typeDefs,
+  resolvers
+});
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// server will be applied as middleware for all requests
+server.applyMiddleware({ app }); 
 
+
+// Mongodb connection
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/the-fifth', {
-    useCreateIndex: true,
-    useNewUrlParser: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true
-}, (err) => {
-    if (err) {
-        console.log('Error while connecting ..' + err)
-    } else {
-        console.log('Connected to Database')
-    }
-})
+  useCreateIndex: true,
+  useNewUrlParser: true,
+  useFindAndModify: false,
+}, (err) => { 
+  if (err) {
+    console.log('Error while connecting ..' + err)
+  } else {
+    console.log('Connected to Database')
+  }
+});
+// Mongodb connection
 
-app.listen(8080, _ => {
-    console.log('Listening to 8080 ...');
-})
+app.listen({ port: 4000 }, () => {
+    console.log(`Server ready at http://localhost:4000${server.graphqlPath}`);
+});
