@@ -5,6 +5,7 @@ const { ApolloServer } = require('apollo-server-express');
 const typeDefs = require('../graphql/schema/index');
 const resolvers = require('../graphql/resolvers/index');
 const { deleteUser } = require('../Models/User');
+const PORT = process.env.PORT || 4000;
 const app = express();
 app.use(express.json());
 dotenv.config({path: '../config.env'});
@@ -13,11 +14,8 @@ const server = new ApolloServer({
   resolvers
 });
 
-// server will be applied as middleware for all requests
-server.applyMiddleware({ app }); 
+server.applyMiddleware({ app });
 
-
-// Mongodb connection
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/the-fifth', {
   useCreateIndex: true,
@@ -30,8 +28,6 @@ mongoose.connect('mongodb://localhost/the-fifth', {
     console.log('Connected to Database')
   }
 });
-// Mongodb connection
-
-app.listen({ port: 4000 }, () => {
-    console.log(`Server ready at http://localhost:4000${server.graphqlPath}`);
+app.listen({ port: PORT }, () => {
+    console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`);
 });
