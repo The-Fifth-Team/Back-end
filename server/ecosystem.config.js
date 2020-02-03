@@ -1,6 +1,6 @@
 module.exports = {
   apps : [{
-    name: '◉ server',
+    name: 'API',
     script: 'server.js',
     exec_mode : "cluster",
     // Options reference: https://pm2.keymetrics.io/docs/usage/application-declaration/
