@@ -1,2 +1,0 @@
-this files needs to be manually merged with the mean project
-check the package.json for each file, and make sure you install all the dependencies before you begin with the beginning process
