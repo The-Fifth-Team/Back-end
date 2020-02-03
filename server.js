@@ -2,9 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const { ApolloServer } = require('apollo-server-express');
-const typeDefs = require('../graphql/schema/index');
-const resolvers = require('../graphql/resolvers/index');
-const { deleteUser } = require('../Models/User');
+const typeDefs = require('./graphql/schema');
+const resolvers = require('./graphql/resolvers');
+const { deleteUser } = require('./Models/User');
 const { existsSync, mkdirSync } = require("fs");
 const PORT = process.env.PORT || 4000;
 
