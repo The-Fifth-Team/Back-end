@@ -30,7 +30,7 @@ mongoose.connect('mongodb://localhost/the-fifth', {
     if (err) {
         console.log('Error while connecting ..' + err)
     } else {
-        console.log('Connected to Database')
+        console.log('Connected to Database');
     }
 });
 // Mongodb connection
