@@ -1,1 +1,1 @@
-web: ./server/pm2 start ecosystem.config.js
+web: pm2 start ./server/ecosystem.config.js
