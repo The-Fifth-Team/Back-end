@@ -18,8 +18,10 @@ exports.sendMail = async(email, subject, text,template = "") => {
             port: 25,
             secure: false,
             auth: {
+
                 user: "208388a08a4635",
                 pass: "a53ff223db9006"
+
             },
             tls: {
                 rejectUnauthorized: false
@@ -27,6 +29,7 @@ exports.sendMail = async(email, subject, text,template = "") => {
         });
 
         let info = await transporter.sendMail({
+
             from: "The FIFTH GROUP <test@test.com>",
             to: email,
             subject: subject,
