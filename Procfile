@@ -1,1 +1,1 @@
-web: npm start && pm2 plus
+web: npm start
