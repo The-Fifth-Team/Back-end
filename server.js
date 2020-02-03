@@ -22,7 +22,7 @@ server.applyMiddleware({ app });
 
 // Mongodb connection
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/the-fifth', {
+mongoose.connect('mongodb+srv://ali-jalal:thefifthteam@cluster0-p3vu6.mongodb.net/test?retryWrites=true&w=majority', {
     useCreateIndex: true,
     useNewUrlParser: true,
     useFindAndModify: false,
