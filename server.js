@@ -33,7 +33,7 @@ mongoose.connect('mongodb://localhost/the-fifth', {
         console.log('Connected to Database');
     }
 });
-// Mongodb connection
+// Mongodb connection//
 
 app.listen({ port: PORT }, () => {
     console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`);
