@@ -1,30 +1,33 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const crypto = require('crypto');
 mongoose.Promise = global.Promise;
 const bcrypt = require('bcryptjs')
 const AdminSchema = mongoose.Schema({
-    firstName : {
-        type : String,
-        required : [true, "First Name is Required"],
-        trim : true
+    firstName: {
+        type: String,
+        required: [true, "First Name is Required"],
+        trim: true
     },
-    lastName : {
-        type : String,
-        required : [true, "Last Name is Required"],
-        trim : true
+    lastName: {
+        type: String,
+        required: [true, "Last Name is Required"],
+        trim: true
     },
-    password : {
-        type : String,
-        required : [true, "Password is Required"],
-        trim : true
+    password: {
+        type: String,
+        required: [true, "Password is Required"],
+        trim: true
     },
-    email : {
-        type : String,
-        required : [true, "First Name is Required"],
+    email: {
+        type: String,
+        required: [true, "First Name is Required"],
         lowercase: true,
-        trim : true,
+        trim: true,
         validate: [validator.isEmail, "Must be a valid email"]
-    }
+    },
+    passwordResetToken: String,
+    passwordResetTokenExpired: Date
 });
 
 /**
@@ -36,8 +39,13 @@ AdminSchema.pre('save', function(next) {
     this.password = bcrypt.hashSync(this.password, 8);
     next();
 });
-
-const Admin = mongoose.model("Admin" ,AdminSchema);
+AdminSchema.methods.createPasswordResetToken = function() {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    this.passwordResetTokenExpired = Date.now() + 15 * 60 * 1000;
+    return resetToken;
+};
+const Admin = mongoose.model("Admin", AdminSchema);
 
 /**
  * @function createAdmin accepts an admin object, and persists it in the database
