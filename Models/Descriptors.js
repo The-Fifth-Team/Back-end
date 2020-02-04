@@ -62,13 +62,3 @@ module.exports.findByUserIdDescriptor = userId => {
 module.exports.filterDescriptorsByDate = date => {
   return Descriptor.find({createdAt: date})
 };
-
-
-`type Descriptor {
-    id: ID!
-    front: [Float!]!
-    left: [Float!]!
-    right: [Float!]!
-    userId: String!
-    createdAt: String
-  }`

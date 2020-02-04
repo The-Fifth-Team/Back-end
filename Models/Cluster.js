@@ -14,11 +14,11 @@ var clusterSchema = new Schema({
 
 const Cluster = mongoose.model("Cluster", clusterSchema)
 
-module.exports.insertMany = arrayOfObjects => {
+module.exports.insertManyClusters = arrayOfObjects => {
   return Cluster.insertMany(arrayOfObjects);
 };
 
-module.exports.insertOne = cluster => {
+module.exports.insertOneCluster = cluster => {
   return Cluster.create(cluster);
 };
 
@@ -46,10 +46,3 @@ module.exports.findAllClusters = () => {
 module.exports.filterClustersByDate = date => {
   return Cluster.find({createdAt: date})
 };
-
-
-`type Cluster {
-    id: ID!
-    array: [String!]!
-    createdAt: String
-  }`
