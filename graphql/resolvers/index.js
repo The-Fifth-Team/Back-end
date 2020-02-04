@@ -2,6 +2,7 @@ const { insertUser, deleteUser, getUsers, updateOneUser } = require('../../Model
 const { createAdmin, findOneByIdAndRemove, findAllAdmins, findOneByIdAndUpdate } = require('../../Models/Admin');
 const { insertOne, removeEmotionById, findAllEmotions, updateEmotionById, filterEmotionsByDate } = require('../../Models/Emotion');
 const { insertManyClusters, insertOneCluster, removeClusterById, updateClusterById, findOneCluster, findByIdCluster, findAllClusters, filterClustersByDate } = require('../../Models/Cluster');
+const { insertOneDescriptor, removeDescriptorById, findAllDescriptors, findDescriptorByUserId, filterDescriptorsByDate } = require('../../Models/Descriptors');
 
 module.exports = resolvers = {
     Query: {
@@ -28,10 +29,55 @@ module.exports = resolvers = {
           .then(result => {
             return result
           })
+      },
+      clusters: () => {
+        return findAllClusters()
+          .then(result => {
+            return result;
+          })
+          .catch(err => {
+            throw err;
+          })
+      },
+      filterClusters: (date) => {
+        return filterClustersByDate(date)
+          .then(result => {
+            return result;
+          })
+          .catch(err => {
+            throw err;
+          })
+      },
+      descriptors: () => {
+        return findAllDescriptors()
+          .then(result => {
+            return result;
+          })
+          .catch(err => {
+            throw err;
+          })
+      },
+      findDescriptorByUserId: () => {
+        return findDescriptorByUserId()
+          .then(result => {
+            return result;
+          })
+          .catch(err => {
+            throw err;
+          })
+      },
+
+      filterDescriptors: (date) => {
+        return filterDescriptorsByDate(date)
+          .then(result => {
+            return result;
+          })
+          .catch(err => {
+            throw err;
+          })
       }
 
     },
-
 
     Mutation: {
       addUser: (_, { firstName, lastName, password, age, gender } ) => {
@@ -90,8 +136,6 @@ module.exports = resolvers = {
             throw err;
           })
       },
-
-
       // Emotion Part --> to be refactored later on
       addEmotion: (_, { neutral, angry, disgust, happy, fear, sad, surprised, userId }) => {
         return insertOne({ neutral, angry, disgust, happy, fear, sad, surprised, userId })
@@ -120,16 +164,8 @@ module.exports = resolvers = {
             return err;
           })
       },
-      // filterEmotions: (_, { date }) => {
-      //   return filterEmotionsByDate(date)
-      //     .then(result => {
-      //       return result
-      //     })
-      // },
 
-
-
-      // Cluster Part --> to be refactored later on
+      // Cluster Part
       addClusters: (_, arrayOfObjects) => {
         return insertManyClusters(arrayOfObjects)
           .then(result => {
@@ -148,17 +184,18 @@ module.exports = resolvers = {
             throw err;
           })
       },
-      allClusters: () => {
-        return findAllClusters()
+      // Descriptor Part
+      addDescriptor: (_, descriptor) => {
+        return insertOneDescriptor(descriptor)
           .then(result => {
-            return result;
+            return result
           })
           .catch(err => {
             throw err;
           })
       },
-      filterClustersByDate: (date) => {
-        return filterClustersByDate(date)
+      removeDescriptor: (_, { _id }) => {
+        return removeDescriptorById(_id)
           .then(result => {
             return result;
           })
@@ -166,6 +203,7 @@ module.exports = resolvers = {
             throw err;
           })
       }
+
 
     }
   };

@@ -23,11 +23,11 @@ var descriptorSchema = new Schema({
 
 const Descriptor = mongoose.model("Descriptor", descriptorSchema);
 
-module.exports.insertMany = arrayOfObjects => {
+module.exports.insertManyDescriptors = arrayOfObjects => {
   return Descriptor.insertMany(arrayOfObjects);
 };
 
-module.exports.insertOne = descriptor => {
+module.exports.insertOneDescriptor = descriptor => {
   return Descriptor.create(descriptor);
 };
 
@@ -55,7 +55,7 @@ module.exports.findAllDescriptors = () => {
   return Descriptor.find({});
 };
 
-module.exports.findByUserIdDescriptor = userId => {
+module.exports.findDescriptorByUserId = userId => {
   return Descriptor.find({userId});
 };
 
