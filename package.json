@@ -2,10 +2,10 @@
   "name": "back-end",
   "version": "1.0.0",
   "description": "Team-five server-side",
-  "main": "server/server.js",
+  "main": "server.js",
   "scripts": {
     "test": "mocha",
-    "start": "nodemon server/server"
+    "start": "pm2-runtime start ecosystem.config.js"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
     "moment": "^2.24.0",
     "mongoose": "^5.8.9",
     "nodemailer": "^6.4.2",
+    "pm2": "^4.2.3",
     "validator": "^12.1.0"
   }
 }
