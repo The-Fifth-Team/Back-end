@@ -30,13 +30,13 @@ exports.json2CsvASync = jsonDoc => {
  * @param jsonObject {object} the object to be converted to csv format
  * @author Abobker Elaghel
  * */
-exports.writeCsvFile = async (filePath, jsonObject) => {
-    try{
+exports.writeCsvFile = async(filePath, jsonObject) => {
+    try {
         const csvFileString = await json2csv.parseAsync(jsonObject);
         filePath = _checkPath(filePath) || filePath;
-        fs.writeFile(filePath, csvFileString,err => throw err);
+        fs.writeFile(filePath, csvFileString, err => { throw err });
         console.info(`Writing to ${filePath} Completed Successfully`);
-    }catch (err) {
+    } catch (err) {
         console.error("Error in Helper_functions folder, writeCsvFile function");
         throw err;
     }

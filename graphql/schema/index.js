@@ -1,11 +1,15 @@
 const { gql } = require('apollo-server-express');
 
-module.exports = typeDefs = gql`
+module.exports = typeDefs = gql `
   type Query {
     users: [User!]!
     admins: [Admin!]!
     emotions: [Emotion!]!
     filterEmotions(date: String!): [Emotion!]!
+  }
+
+  type Token {
+    token: String!
   }
 
   type Mutation {
@@ -20,6 +24,10 @@ module.exports = typeDefs = gql`
     addEmotion(neutral: Int, angry: Int, disgust: Int, happy: Int, fear: Int, sad: Int, surprised: Int, userId: String): Emotion
     removeEmotion(_id: String!): Emotion!
     updateEmotion(_id: String!, obj: emotionObj): Emotion
+
+    forgetPassword(email: String!): String
+    checkToken(token: String): Token!
+    resetPassword(token: String!, email: String!): Token!
   }
 
   type User {
@@ -51,7 +59,22 @@ module.exports = typeDefs = gql`
     userId: String
     createdAt: String
   }
-  
+
+  type Cluster {
+    id: ID!
+    array: [String!]!
+    createdAt: String
+  }
+
+  type Descriptor {
+    id: ID!
+    front: [Float!]!
+    left: [Float!]!
+    right: [Float!]!
+    userId: String!
+    createdAt: String
+  }
+
   input userObj {
     firstName: String
     lastName: String
@@ -59,14 +82,14 @@ module.exports = typeDefs = gql`
     age: Int
     gender: String
   }
-  
+
   input adminObj {
     firstName: String
     lastName: String
     password: String
     email: String
   }
-  
+
   input emotionObj {
     neutral: Int
     angry: Int

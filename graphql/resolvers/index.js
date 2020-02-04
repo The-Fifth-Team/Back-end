@@ -1,6 +1,7 @@
 const { insertUser, deleteUser, getUsers, updateOneUser } = require('../../Models/User');
 const { createAdmin, findOneByIdAndRemove, findAllAdmins, findOneByIdAndUpdate } = require('../../Models/Admin');
 const { insertOne, removeEmotionById, findAllEmotions, updateEmotionById, filterEmotionsByDate } = require('../../Models/Emotion');
+const { insertManyClusters, insertOneCluster, removeClusterById, updateClusterById, findOneCluster, findByIdCluster, findAllClusters, filterClustersByDate } = require('../../Models/Cluster');
 
 module.exports = resolvers = {
     Query: {
@@ -28,10 +29,10 @@ module.exports = resolvers = {
             return result
           })
       }
-      
+
     },
-    
-   
+
+
     Mutation: {
       addUser: (_, { firstName, lastName, password, age, gender } ) => {
         return insertUser( { firstName, lastName, password, age, gender } )
@@ -124,6 +125,7 @@ module.exports = resolvers = {
       //     .then(result => {
       //       return result
       //     })
-      // }
+      // },
+
     }
   };
