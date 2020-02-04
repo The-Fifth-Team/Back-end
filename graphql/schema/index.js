@@ -1,11 +1,15 @@
 const { gql } = require('apollo-server-express');
 
-module.exports = typeDefs = gql`
+module.exports = typeDefs = gql `
   type Query {
     users: [User!]!
     admins: [Admin!]!
     emotions: [Emotion!]!
     filterEmotions(date: String!): [Emotion!]!
+  }
+  
+  type Token {
+    token: String!
   }
 
   type Mutation {
@@ -20,6 +24,10 @@ module.exports = typeDefs = gql`
     addEmotion(neutral: Int, angry: Int, disgust: Int, happy: Int, fear: Int, sad: Int, surprised: Int, userId: String): Emotion
     removeEmotion(_id: String!): Emotion!
     updateEmotion(_id: String!, obj: emotionObj): Emotion
+
+    forgetPassword(email: String!): String
+    checkToken(token: String): Token!
+    resetPassword(token: String!, email: String!): Token!
   }
 
   type User {
