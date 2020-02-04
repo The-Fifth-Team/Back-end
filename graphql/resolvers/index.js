@@ -127,5 +127,45 @@ module.exports = resolvers = {
       //     })
       // },
 
+
+
+      // Cluster Part --> to be refactored later on
+      addClusters: (_, arrayOfObjects) => {
+        return insertManyClusters(arrayOfObjects)
+          .then(result => {
+            return result
+          })
+          .catch(err => {
+            throw err;
+          })
+      },
+      removeCluster: (_, { _id }) => {
+        return removeClusterById(_id)
+          .then(result => {
+            return result;
+          })
+          .catch(err => {
+            throw err;
+          })
+      },
+      allClusters: () => {
+        return findAllClusters()
+          .then(result => {
+            return result;
+          })
+          .catch(err => {
+            throw err;
+          })
+      },
+      filterClustersByDate: (date) => {
+        return filterClustersByDate(date)
+          .then(result => {
+            return result;
+          })
+          .catch(err => {
+            throw err;
+          })
+      }
+
     }
   };
