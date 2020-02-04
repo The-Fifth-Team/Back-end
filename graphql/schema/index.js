@@ -3,6 +3,7 @@ const { gql } = require('apollo-server-express');
 module.exports = typeDefs = gql `
   type Query {
     users: [User!]!
+    allPhotos: [Photo]
     admins: [Admin!]!
     emotions: [Emotion!]!
     filterEmotions(date: String!): [Emotion!]!
@@ -10,6 +11,11 @@ module.exports = typeDefs = gql `
   
   type Token {
     token: String!
+  }
+  
+  type Photo {
+    filename: String!
+    path: String!
   }
 
   type Mutation {
@@ -28,6 +34,7 @@ module.exports = typeDefs = gql `
     forgetPassword(email: String!): String
     checkToken(token: String): Token!
     resetPassword(token: String!, email: String!): Token!
+     uploadPhoto(photo: Upload!): Photo!
   }
 
   type User {

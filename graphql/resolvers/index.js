@@ -1,6 +1,14 @@
 const { insertUser, deleteUser, getUsers, updateOneUser } = require('../../Models/User');
 const { createAdmin, findOneByIdAndRemove, findAllAdmins, findOneByIdAndUpdate } = require('../../Models/Admin');
 const { insertOne, removeEmotionById, findAllEmotions, updateEmotionById, filterEmotionsByDate } = require('../../Models/Emotion');
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: "dwtaamxgn",
+  api_key: "431917237583798",
+  api_secret: "LC0J_kCL5lesk7PVP1KviAgHSKY"
+});
+
 
 module.exports = resolvers = {
     Query: {
@@ -28,10 +36,7 @@ module.exports = resolvers = {
             return result
           })
       }
-      
     },
-    
-   
     Mutation: {
       addUser: (_, { firstName, lastName, password, age, gender } ) => {
         return insertUser( { firstName, lastName, password, age, gender } )
@@ -125,5 +130,26 @@ module.exports = resolvers = {
       //       return result
       //     })
       // }
+    },
+  async uploadPhoto (parent, { photo }) {
+    const { filename, createReadStream } = await photo;
+
+    try {
+      const result = await new Promise((resolve, reject) => {
+        createReadStream().pipe(
+            cloudinary.uploader.upload_stream((error, result) => {
+              if (error) {
+                reject(error)
+              }
+              resolve(result)
+            })
+        )
+      });
+      // const newPhoto = { filename, path: result.secure_url };
+      // photos.push(newPhoto);
+      return result;
+    } catch (err) {
+      console.log(err)
     }
-  };
+  }
+};
