@@ -4,26 +4,27 @@ const validator = require('validator');
 const userSchema = mongoose.Schema({
   firstName: {
     type: String,
-    required: true,
+    required: [true, "firstName is Required"],
     trim: true,
   },
   lastName: {
     type: String,
-    required: true,
+    required: [true, "lastName is Required"],
     trim: true,
-  },
-  password: {
-    type: String,
-    required: true,
   },
   age: {
     type: Number,
-    required: true,
+    enum: ['Male','Female'],
+    required: [true, "age is Required"],
   },
   gender: {
     type: String,
-    required: true,
+    required: [true, "gender is Required"],
     trim: true,
+  },
+  photoUrl: {
+    type: String,
+    trim: true
   }
 });
 
