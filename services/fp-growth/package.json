@@ -1,0 +1,16 @@
+{
+  "name": "fp-growth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "fpgrowth.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "density-clustering": "^1.3.0",
+    "node-fpgrowth": "^1.2.1"
+  }
+}

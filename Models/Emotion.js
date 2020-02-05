@@ -34,11 +34,11 @@ const Emotion = mongoose.model("Emotion", mongoose.Schema({
   }
 }));
 
-module.exports.insertMany = arrayOfObjects => {
+module.exports.insertManyEmotion = arrayOfObjects => {
   return Emotion.insertMany(arrayOfObjects);
 };
 
-module.exports.insertOne = emotion => {
+module.exports.insertOneEmotion = emotion => {
   return Emotion.create(emotion);
 };
 

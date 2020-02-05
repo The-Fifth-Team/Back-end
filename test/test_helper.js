@@ -9,6 +9,7 @@ before((done) => {
             done();
         })
         .on('error', err => {
+            console.warn("Make Sure you have MangoDB installed");
             console.warn("Warning", err);
         });
 });
