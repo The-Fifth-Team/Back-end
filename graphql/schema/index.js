@@ -38,12 +38,12 @@ module.exports = typeDefs = gql `
   }
 
   type User {
-    id: ID!
     firstName: String!
     lastName: String!
-    password: String!
     age: Int!
     gender: String!
+    descriptors: [[Int]]!
+    photo: Upload!
   }
 
   type Admin {
