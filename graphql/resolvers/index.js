@@ -1,3 +1,5 @@
+const {removeDescriptorById} = require("../../Models/Descriptors");
+const {removeClusterById, insertManyClusters} = require("../../Models/Cluster");
 const { insertUser, deleteUser, getUsers, updateOneUser } = require('../../Models/User');
 const { createAdmin, findOneByIdAndRemove, findAllAdmins, findOneByIdAndUpdate } = require('../../Models/Admin');
 const { insertOneEmotion, removeEmotionById, findAllEmotions, updateEmotionById, filterEmotionsByDate } = require('../../Models/Emotion');
@@ -168,12 +170,6 @@ module.exports = resolvers = {
                     return err;
                 })
         },
-        // filterEmotions: (_, { date }) => {
-        //   return filterEmotionsByDate(date)
-        //     .then(result => {
-        //       return result
-        //     })
-        // }
         async uploadUser(parent, { data }) {
             const { filename, createReadStream } = await data.photo;
             try {
@@ -199,10 +195,14 @@ module.exports = resolvers = {
                 if (!user) {
                     return new Error("Error with inserting the user")
                 }
-
                 //the code for inserting the Descriptor should follow here
-
-
+                insertOneDescriptor({
+                    userId: user._id,
+                    front: data.descriptors[0],
+                    left:data.descriptors[1],
+                    right:data.descriptors[2]
+                });
+                console.log("Inserted Successful");
             } catch (err) {
                 console.error(err);
                 return err;
@@ -221,15 +221,6 @@ module.exports = resolvers = {
             return removeClusterById(_id)
                 .then(result => {
                     return result;
-                })
-                .catch(err => {
-                    throw err;
-                })
-        },
-        async addDescriptor(_, descriptor) {
-            return insertOneDescriptor(descriptor)
-                .then(result => {
-                    return result
                 })
                 .catch(err => {
                     throw err;
