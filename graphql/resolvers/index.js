@@ -1,6 +1,7 @@
 const { insertUser, deleteUser, getUsers, updateOneUser } = require('../../Models/User');
 const { createAdmin, findOneByIdAndRemove, findAllAdmins, findOneByIdAndUpdate } = require('../../Models/Admin');
-const { insertOne, removeEmotionById, findAllEmotions, updateEmotionById, filterEmotionsByDate } = require('../../Models/Emotion');
+const { insertOneEmotion, removeEmotionById, findAllEmotions, updateEmotionById, filterEmotionsByDate } = require('../../Models/Emotion');
+const {insertOneDescriptor} = require('../../Models/Descriptors.js');
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
@@ -98,7 +99,7 @@ module.exports = resolvers = {
 
       // Emotion Part --> to be refactored later on
       addEmotion: (_, { neutral, angry, disgust, happy, fear, sad, surprised, userId }) => {
-        return insertOne({ neutral, angry, disgust, happy, fear, sad, surprised, userId })
+        return insertOneEmotion({ neutral, angry, disgust, happy, fear, sad, surprised, userId })
           .then(result => {
             return result
           })
@@ -131,9 +132,8 @@ module.exports = resolvers = {
       //     })
       // }
     },
-  async uploadPhoto (parent, { photo }) {
-    const { filename, createReadStream } = await photo;
-
+  async uploadUser (parent, { data }) {
+    const { filename, createReadStream } = await data.photo;
     try {
       const result = await new Promise((resolve, reject) => {
         createReadStream().pipe(
@@ -147,9 +147,23 @@ module.exports = resolvers = {
       });
       // const newPhoto = { filename, path: result.secure_url };
       // photos.push(newPhoto);
-      return result;
+      let user = await insertUser({
+       firstName: data.firstName,
+       lastName: data.lastName,
+       age: data.age,
+       gender: data.gender,
+       photoUrl: result.secure_url
+      });
+      if(!user){
+        return new Error("Error with inserting the user")
+      }
+
+      //the code for inserting the Descriptor should follow here
+
+
     } catch (err) {
-      console.log(err)
+      console.error(err);
+        return err;
     }
   }
 };

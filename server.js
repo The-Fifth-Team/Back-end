@@ -23,6 +23,7 @@ mongoose.connect('mongodb+srv://ali-jalal:thefifthteam@cluster0-p3vu6.mongodb.ne
     useCreateIndex: true,
     useNewUrlParser: true,
     useFindAndModify: false,
+    useUnifiedTopology: true
 }, (err) => {
     if (err) {
         console.log('Error while connecting ..' + err)
@@ -35,4 +36,3 @@ mongoose.connect('mongodb+srv://ali-jalal:thefifthteam@cluster0-p3vu6.mongodb.ne
 app.listen({ port: PORT }, () => {
     console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`);
 });
-

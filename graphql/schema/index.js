@@ -31,10 +31,10 @@ module.exports = typeDefs = gql `
     removeEmotion(_id: String!): Emotion!
     updateEmotion(_id: String!, obj: emotionObj): Emotion
 
-    forgetPassword(email: String!): String
+    forgetPassword(email: String!): Token
     checkToken(token: String): Token!
     resetPassword(token: String!, email: String!): Token!
-     uploadPhoto(photo: Upload!): Photo!
+    uploadUser(data: User!): Photo! //to be edit, the return  type is proper 
   }
 
   type User {
@@ -91,5 +91,14 @@ module.exports = typeDefs = gql `
     sad: Int
     surprised: Int
     userId: String
+  }
+  
+  input User {
+    firstname: String!
+    lastName: String!
+    age: Int!
+    gender: String!
+    descrotports: [[Int]]!
+    photo: Upload!
   }
 `;

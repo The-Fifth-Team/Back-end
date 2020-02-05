@@ -12,12 +12,9 @@ const userSchema = mongoose.Schema({
     required: [true, "lastName is Required"],
     trim: true,
   },
-  password: {
-    type: String,
-    required: [true, "password is Required"],
-  },
   age: {
     type: Number,
+    enum: ['Male','Female'],
     required: [true, "age is Required"],
   },
   gender: {

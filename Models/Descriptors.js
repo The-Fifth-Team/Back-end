@@ -1,9 +1,10 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var descriptorSchema = new Schema({
+const descriptorSchema = new Schema({
     userId: {
-        type: Number,
+        type: Schema.Types.ObjectID,
+        ref: "User",
         required: true
     },
     front: {
@@ -18,16 +19,16 @@ var descriptorSchema = new Schema({
         type: [Number],
         required: true
     }
-})
+});
 
 
 const Descriptor = mongoose.model("Descriptor", descriptorSchema);
 
-module.exports.insertMany = arrayOfObjects => {
+module.exports.insertManyDescriptor = arrayOfObjects => {
   return Descriptor.insertMany(arrayOfObjects);
 };
 
-module.exports.insertOne = descriptor => {
+module.exports.insertOneDescriptor = descriptor => {
   return Descriptor.create(descriptor);
 };
 
