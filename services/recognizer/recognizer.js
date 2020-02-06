@@ -2,6 +2,7 @@ const tensorFlow = require('@tensorflow/tfjs-node')
 const canvas = require('canvas');
 const faceapi = require('face-api.js');
 const insertMany = require('../../Models/Emotion').insertMany;
+const findAllDescriptors = require('../../Models/Descriptors').findAllDescriptors
 
 const {
   Canvas,
@@ -14,24 +15,38 @@ faceapi.env.monkeyPatch({
   ImageData
 })
 
-
-
 export default function (whatYouRecievFromTheFrontEnd) {
   Promise.all([
-    faceapi.nets.faceRecognitionNet.loadFromDisk('weights'),
-    faceapi.nets.faceLandmark68Net.loadFromDisk('weights'),
-    faceapi.nets.ssdMobilenetv1.loadFromDisk('weights'),
-    faceapi.nets.faceExpressionNet.loadFromDisk('weights')
+    faceapi.nets.faceRecognitionNet.loadFromDisk('models'),
+    faceapi.nets.faceLandmark68Net.loadFromDisk('models'),
+    faceapi.nets.ssdMobilenetv1.loadFromDisk('models'),
+    faceapi.nets.faceExpressionNet.loadFromDisk('models')
   ]).then(start)
 
-  function start() {
-    const labeledFaceDescriptors; // get from db
-    let toBeSavedtoDB = []
-    const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6)
-    whatYouRecievFromTheFrontEnd.forEach(fd => {
-      const bestMatch = faceMatcher.findBestMatch(fd.descriptor)
-      toBeSavedtoDB.push({userId: bestMatch.toString(), expressions:fd.expressions})
+  function async start() {
+    var toBeSavedtoDB = []
+    const dbLabeledFaceDescriptors = await findAllDescriptors();
+
+    labeledFaceDescriptors = dbLabeledFaceDescriptors.map((record) => {
+      return new faceapi.LabeledFaceDescriptors(record.userId, [record.front, record.left, record.right])
     })
+
+    var faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6)
+
+    whatYouRecievFromTheFrontEnd.forEach(fd => {
+      let obj = {}
+      const bestMatch = faceMatcher.findBestMatch(fd.descriptor)
+      obj.userId = bestMatch.toString();
+      obj.neutral = fd.expressions.neutral;
+      obj.angry = fd.expressions.angry;
+      obj.disgust = fd.expressions.disgust;
+      obj.happy = fd.expressions.happy;
+      obj.fear = fd.expressions.fear;
+      obj.sad = fd.expressions.sad;
+      obj.surprised = fd.expressions.surprised;
+      toBeSavedtoDB.push(obj)
+    })
+
     return insertMany(toBeSavedtoDB)
   }
 }
