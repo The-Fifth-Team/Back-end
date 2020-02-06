@@ -7,18 +7,16 @@ module.exports = typeDefs = gql `
     admins: [Admin!]!
     emotions: [Emotion!]!
     filterEmotions(date: String!): [Emotion!]!
-  }
-
+    getPeriodEmotions(startDate: String!, endDate: String!): [[[Float!]!]!,[Status!]]!
   type Token {
     token: String!
   }
-  
   type Photo {
     filename: String!
     path: String!
   }
-
   type Mutation {
+    addUser(firstName: String!, lastName: String!, password: String!, age: Int!, gender: String!): User!
     addUser(firstName: String!, lastName: String!, password: String!, age: Int!, gender: String!): User!
     removeUser(userId: String!): User!
     updateUser(userId: String!, obj: userObj): User
@@ -34,7 +32,7 @@ module.exports = typeDefs = gql `
     forgetPassword(email: String!): Token
     checkToken(token: String): Token!
     resetPassword(token: String!, email: String!): Token!
-    uploadUser(data: User!): Photo! //to be edit, the return  type is proper 
+    uploadUser(data: User!): Photo 
   }
 
   type User {
@@ -45,7 +43,6 @@ module.exports = typeDefs = gql `
     descriptors: [[Float]]!
     photo: Upload!
   }
-
   type Admin {
     id: ID!
     firstName: String!
@@ -53,26 +50,22 @@ module.exports = typeDefs = gql `
     password: String!
     email: String!
   }
-
   type Emotion {
-    id: ID!
-    neutral: Int
-    angry: Int
-    disgust: Int
-    happy: Int
-    fear: Int
-    sad: Int
-    surprised: Int
-    userId: String
+    neutral: Float
+    happy: Float
+    sad: Float
+    angry: Float
+    fearful: Float
+    disgusted: Float
+    surprised: Float
+    userId: ID
     createdAt: String
   }
-
   type Cluster {
     id: ID!
     array: [String!]!
     createdAt: String
   }
-
   type Descriptor {
     id: ID!
     front: [Float!]!
@@ -81,7 +74,6 @@ module.exports = typeDefs = gql `
     userId: String!
     createdAt: String
   }
-
   input userObj {
     firstName: String
     lastName: String
@@ -89,14 +81,12 @@ module.exports = typeDefs = gql `
     age: Int
     gender: String
   }
-
   input adminObj {
     firstName: String
     lastName: String
     password: String
     email: String
   }
-
   input emotionObj {
     neutral: Int
     angry: Int
@@ -107,13 +97,12 @@ module.exports = typeDefs = gql `
     surprised: Int
     userId: String
   }
-  
   input User {
-    firstname: String!
+    firstName: String!
     lastName: String!
     age: Int!
     gender: String!
-    descrotports: [[Float]]!
+    descriptors: [[Float]]!
     photo: Upload!
   }
 `;
