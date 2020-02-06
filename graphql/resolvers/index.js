@@ -12,11 +12,10 @@ cloudinary.config({
     api_secret: "LC0J_kCL5lesk7PVP1KviAgHSKY"
 });
 
-
 module.exports = resolvers = {
     Query: {
-        users: async() => {
-            return await getUsers()
+        users () {
+            return getUsers()
                 .then(result => {
                     return result;
                 })
@@ -24,7 +23,7 @@ module.exports = resolvers = {
                     throw err;
                 })
         },
-        admins: () => {
+        admins() {
             return findAllAdmins()
                 .then(result => {
                     return result;
@@ -33,13 +32,13 @@ module.exports = resolvers = {
                     throw err;
                 })
         },
-        filterEmotions: (_, { date }) => {
+        filterEmotions (_, { date }){
             return filterEmotionsByDate(date)
                 .then(result => {
                     return result
                 })
         },
-        clusters: () => {
+        clusters() {
             return findAllClusters()
                 .then(result => {
                     return result;
@@ -48,7 +47,7 @@ module.exports = resolvers = {
                     throw err;
                 })
         },
-        filterClusters: (date) => {
+        filterClusters(date){
             return filterClustersByDate(date)
                 .then(result => {
                     return result;
@@ -57,7 +56,7 @@ module.exports = resolvers = {
                     throw err;
                 })
         },
-        descriptors: () => {
+        descriptors(){
             return findAllDescriptors()
                 .then(result => {
                     return result;
@@ -66,7 +65,7 @@ module.exports = resolvers = {
                     throw err;
                 })
         },
-        findDescriptorByUserId: () => {
+        findDescriptorByUserId(){
             return findDescriptorByUserId()
                 .then(result => {
                     return result;
@@ -75,8 +74,7 @@ module.exports = resolvers = {
                     throw err;
                 })
         },
-
-        filterDescriptors: (date) => {
+        filterDescriptors(date){
             return filterDescriptorsByDate(date)
                 .then(result => {
                     return result;
@@ -84,6 +82,172 @@ module.exports = resolvers = {
                 .catch(err => {
                     throw err;
                 })
+        },
+        async getPeriodEmotions(_, { startDate, endDate }) {
+            let startDateInt = parseInt(startDate);
+            let endDateInt = parseInt(endDate);
+            startDate = new Date(startDateInt);
+            endDate = new Date(endDateInt);
+            let arrayOfEmotions;
+            let emotionsTotal = [];
+            let assertCounter = 0;
+            const MAX_ITERATIONS = 10000;
+            let neutralStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let happyStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let sadStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let angryStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let fearfulStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let disgustedStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let surprisedStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            while ((startDateInt < endDateInt) && (assertCounter < MAX_ITERATIONS)) {
+                assertCounter++;
+                startDateIntNext = new Date((startDateInt + (15 * 60 * 1000)));
+                arrayOfEmotions = await findEmotions({ "createdAt": { "$gte": startDate, "$lt": startDateIntNext } });
+                for (let i = 0; i < arrayOfEmotions.length; i++) {
+                    if (arrayOfEmotions[i]["neutral"] > neutralStatus.maxValue) {
+                        neutralStatus.maxValue = arrayOfEmotions[i]["neutral"];
+                        neutralStatus.startAtMax = startDate.getTime().toString();
+                        neutralStatus.endAtMax = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["neutral"] < neutralStatus.minValue) {
+                        neutralStatus.minValue = arrayOfEmotions[i]["neutral"];
+                        neutralStatus.startAtMin = startDate.getTime().toString();
+                        neutralStatus.endAtMin = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["happy"] > happyStatus.maxValue) {
+                        happyStatus.maxValue = arrayOfEmotions[i]["happy"];
+                        happyStatus.startAtMax = startDate.getTime().toString();
+                        happyStatus.endAtMax = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["happy"] < happyStatus.minValue) {
+                        happyStatus.minValue = arrayOfEmotions[i]["happy"];
+                        happyStatus.startAtMin = startDate.getTime().toString();
+                        happyStatus.endAtMin = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["sad"] > sadStatus.maxValue) {
+                        sadStatus.maxValue = arrayOfEmotions[i]["sad"];
+                        sadStatus.startAtMax = startDate.getTime().toString();
+                        sadStatus.endAtMax = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["sad"] < sadStatus.minValue) {
+                        sadStatus.minValue = arrayOfEmotions[i]["sad"];
+                        sadStatus.startAtMin = startDate.getTime().toString();
+                        sadStatus.endAtMin = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["angry"] > angryStatus.maxValue) {
+                        angryStatus.maxValue = arrayOfEmotions[i]["angry"];
+                        angryStatus.startAtMax = startDate.getTime().toString();
+                        angryStatus.endAtMax = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["angry"] < angryStatus.minValue) {
+                        angryStatus.minValue = arrayOfEmotions[i]["angry"];
+                        angryStatus.startAtMin = startDate.getTime().toString();
+                        angryStatus.endAtMin = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["fearful"] > fearfulStatus.maxValue) {
+                        fearfulStatus.maxValue = arrayOfEmotions[i]["fearful"];
+                        fearfulStatus.startAtMax = startDate.getTime().toString();
+                        fearfulStatus.endAtMax = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["fearful"] < fearfulStatus.minValue) {
+                        fearfulStatus.minValue = arrayOfEmotions[i]["fearful"];
+                        fearfulStatus.startAtMin = startDate.getTime().toString();
+                        fearfulStatus.endAtMin = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["disgusted"] > disgustedStatus.maxValue) {
+                        disgustedStatus.maxValue = arrayOfEmotions[i]["disgusted"];
+                        disgustedStatus.startAtMax = startDate.getTime().toString();
+                        disgustedStatus.endAtMax = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["disgusted"] < disgustedStatus.minValue) {
+                        disgustedStatus.minValue = arrayOfEmotions[i]["disgusted"];
+                        disgustedStatus.startAtMin = startDate.getTime().toString();
+                        disgustedStatus.endAtMin = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["surprised"] > surprisedStatus.maxValue) {
+                        surprisedStatus.maxValue = arrayOfEmotions[i]["surprised"];
+                        surprisedStatus.startAtMax = startDate.getTime().toString();
+                        surprisedStatus.endAtMax = startDateIntNext.getTime().toString();
+                    }
+                    if (arrayOfEmotions[i]["surprised"] < surprisedStatus.minValue) {
+                        surprisedStatus.minValue = arrayOfEmotions[i]["surprised"];
+                        surprisedStatus.startAtMin = startDate.getTime().toString();
+                        surprisedStatus.endAtMin = startDateIntNext.getTime().toString();
+                    }
+                }
+                emotionsTotal.push(arrayOfEmotions);
+                startDateInt = startDateIntNext;
+            }
+            let finalResult = [];
+            let neutralSum = 0;
+            let happySum = 0;
+            let sadSum = 0;
+            let angrySum = 0;
+            let fearfulSum = 0;
+            let disgustedSum = 0;
+            let surprisedSum = 0;
+            for (let i = 0; i < emotionsTotal.length; i++) {
+                for (let j = 0; j < emotionsTotal[i]; j++) {
+                    neutralSum = neutralSum += emotionsTotal[i][j]["neutral"];
+                    happySum = happySum += emotionsTotal[i][j]["happy"];
+                    sadSum = sadSum += emotionsTotal[i][j]["sad"];
+                    angrySum = angrySum += emotionsTotal[i][j]["angry"];
+                    fearfulSum = fearfulSum += emotionsTotal[i][j]["fearful"];
+                    disgustedSum = disgustedSum += emotionsTotal[i][j]["disgusted"];
+                    surprisedSum = surprisedSum += emotionsTotal[i][j]["surprised"];
+                }
+                finalResult.push([(neutralSum / emotionsTotal[i]), (happySum / emotionsTotal[i]), (sadSum / emotionsTotal[i]), (angrySum / emotionsTotal[i]), (fearfulSum / emotionsTotal[i]), (disgustedSum / emotionsTotal[i]), (surprisedSum / emotionsTotal[i])])
+            }
+            return [finalResult, [neutralStatus, happyStatus, sadStatus, angryStatus, fearfulStatus, disgustedStatus, surprisedStatus]]
         }
     },
     Mutation: {
@@ -114,7 +278,6 @@ module.exports = resolvers = {
                     throw err;
                 })
         },
-        // Admin Part --> to be refactored Laster on
         addAdmin(_, { firstName, lastName, email, password }) {
             return createAdmin({ firstName, lastName, email, password })
                 .then(result => {
