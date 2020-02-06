@@ -1,8 +1,8 @@
 const tensorFlow = require('@tensorflow/tfjs-node')
 const canvas = require('canvas');
 const faceapi = require('face-api.js');
-const insertMany = require('../../Models/Emotion').insertMany;
-const findAllDescriptors = require('../../Models/Descriptors').findAllDescriptors
+//const insertMany = require('../../Models/Emotion').insertMany;
+//const findAllDescriptors = require('../../Models/Descriptors').findAllDescriptors
 
 const {
   Canvas,
@@ -47,6 +47,8 @@ export default function (whatYouRecievFromTheFrontEnd) {
       toBeSavedtoDB.push(obj)
     })
 
-    return insertMany(toBeSavedtoDB)
+    //return insertMany(toBeSavedtoDB)
+
+    return toBeSavedtoDB
   }
 }
