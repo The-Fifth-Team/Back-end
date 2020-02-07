@@ -26,7 +26,7 @@ const Emotion = mongoose.model("Emotion", mongoose.Schema({
         type: Number,
         default: 0
     },
-    surprised:{
+    surprised: {
         type: Number,
         default: 0
     },
@@ -40,13 +40,12 @@ const Emotion = mongoose.model("Emotion", mongoose.Schema({
         require: true
     }
 }));
-
 module.exports.insertManyEmotion = arrayOfObjects => {
     return Emotion.insertMany(arrayOfObjects);
 };
 
-module.exports.insertOneEmotion = emotion => {
-    return Emotion.create(emotion);
+module.exports.insertOneEmotion = emotionObject => {
+    return Emotion.create(emotionObject);
 };
 
 module.exports.removeEmotionById = _id => {
@@ -58,7 +57,7 @@ module.exports.removeEmotionsByUserId = userId => {
 };
 
 module.exports.updateEmotionById = (_id, criteriaObject) => {
-    return Emotion.findByIdAndUpdate({ _id }, criteriaObject);
+    return Emotion.findByIdAndUpdate(_id, criteriaObject);
 };
 
 module.exports.findOneEmotion = criteriaObject => {

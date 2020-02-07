@@ -1,7 +1,7 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var clusterSchema = new Schema({
+const clusterSchema = new Schema({
     array: {
         type: [String],
         required: true
@@ -10,9 +10,9 @@ var clusterSchema = new Schema({
         type: Number,
         required: true
     }
-})
+});
 
-const Cluster = mongoose.model("Cluster", clusterSchema)
+const Cluster = mongoose.model("Cluster", clusterSchema);
 
 module.exports.insertManyClusters = arrayOfObjects => {
   return Cluster.insertMany(arrayOfObjects);
