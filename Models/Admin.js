@@ -26,6 +26,10 @@ const AdminSchema = mongoose.Schema({
         trim: true,
         validate: [validator.isEmail, "Must be a valid email"]
     },
+    createdAt: {
+        type: Date,
+        default: Date.now()
+    },
     passwordResetToken: String,
     passwordResetTokenExpired: Date
 });
@@ -53,7 +57,7 @@ const Admin = mongoose.model("Admin", AdminSchema);
  * @return {Promise<object>} Promise which contain the admin added OR error if any occurs
  * */
 module.exports.createAdmin = admin => {
-    return Admin.find(admin).then(data => { // check using email
+    return Admin.find({ email: admin.email }).then(data => { // check using email
         if (!data.length) {
             return Admin.create(admin);
         } else {
@@ -74,14 +78,14 @@ module.exports.findByIdAdmin = _id => {
 };
 
 /**
- * @function findOneByIdAndRemove finds an admin in the database based on his/her object id
+ * @function findOneByIdAndRemoveAdmin finds an admin in the database based on his/her object id
  * @param _id {string} object_id as a String
  * @return {Promise<object>} Promise which contain the admin OR error if any occurs
  * */
-module.exports.findOneByIdAndRemove = _id => {
+module.exports.findOneByIdAndRemoveAdmin = _id => {
     return Admin.findByIdAndRemove(_id)
 };
-module.exports.findOneByIdAndUpdate = (_id, criteriaObject) => {
+module.exports.findOneByIdAndUpdateAdmin = (_id, criteriaObject) => {
     return Admin.findByIdAndUpdate({ _id }, criteriaObject);
 };
 /**
@@ -92,9 +96,9 @@ module.exports.findOneByIdAndUpdate = (_id, criteriaObject) => {
 module.exports.findOneAdmin = criteriaObject => {
     return Admin.findOne(criteriaObject);
 };
-module.exports.findAllAdmins = criteriaObject => {
-    return Admin.find();
+module.exports.findAdmins = (criteriaObject = {}) => {
+    return Admin.find(criteriaObject);
 };
-module.exports.findOneAndUpdate = (criteriaObject, updateCriteriaObject) => {
+module.exports.findOneAndUpdateAdmin = (criteriaObject, updateCriteriaObject) => {
     return Admin.findOneAndUpdate(criteriaObject, updateCriteriaObject);
 };

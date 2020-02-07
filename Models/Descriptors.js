@@ -18,6 +18,10 @@ const descriptorSchema = new Schema({
     right: {
         type: [Number],
         required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now()
     }
 });
 
@@ -41,7 +45,7 @@ module.exports.removeDescriptorsByUserId = userId => {
 };
 
 module.exports.updateDescriptorById = (_id, criteriaObject) => {
-    return Descriptor.findByIdAndUpdate({ _id }, criteriaObject);
+    return Descriptor.findByIdAndUpdate(_id, criteriaObject);
 };
 
 module.exports.findOneDescriptor = criteriaObject => {
@@ -58,8 +62,4 @@ module.exports.findAllDescriptors = () => {
 
 module.exports.findDescriptorByUserId = userId => {
     return Descriptor.find({ userId });
-};
-
-module.exports.filterDescriptorsByDate = date => {
-    return Descriptor.find({ createdAt: date })
 };
