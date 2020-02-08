@@ -5,9 +5,9 @@ module.exports = {
     exec_mode : "cluster_mode",
     // Options reference: https://pm2.keymetrics.io/docs/usage/application-declaration/
     args: 'one two',
-    instances: "max",
+    instances: "4",
     autorestart: true,
-    watch: true,
+    watch: false,
     max_memory_restart: '2G',
     env: {
       NODE_ENV: 'development'
@@ -16,7 +16,6 @@ module.exports = {
       NODE_ENV: 'production'
     }
   }],
-
   deploy : {
     production : {
       user : 'node',
