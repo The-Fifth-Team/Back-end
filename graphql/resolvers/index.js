@@ -21,8 +21,8 @@ const resolvers = {
          * @async
          * @function uploadUser used to save a user to the database of the system with his/her photo and face descriptors
          * @param parent pointer which points to the parent function which called this function (IF EXISTS)
-         * @param data {object} the object that contains the data needed for this mutation
-         * @return user {Promise<object|Error>} the User that get saved to the database, return Error if problem occurred
+         * @param {object} data  the object that contains the data needed for this mutation
+         * @return {Promise<object|Error>} user  the User that get saved to the database, return Error if problem occurred
          * @author Abobker Elaghel
          * @since 1.0.0
          */
@@ -65,7 +65,7 @@ const resolvers = {
         /**
          * @function addAdmin used to add an admin to the database
          * @param parent pointer which points to the parent function which called this function (IF EXISTS)
-         * @param data {object} the object that contains the data needed for this mutation, admin object
+         * @param {object} data  the object that contains the data needed for this mutation, admin object
          * @return {Promise<object|Error>} the admin that get saved to the database, return Error if problem occurred
          * @author Abobker Elaghel
          * @since 1.0.0
@@ -83,16 +83,18 @@ const resolvers = {
          */
         getAllUsers() {
             return User.findUsers();
-        },
+        }
         /**
          * @function getAllAdmins pulls all the admin from the database
          * @return {Promise<object|Error>} all the admins that exists in the database, return Error if problem occurred
          * @author Abobker Elaghel
          * @since 1.0.0
+         * @deprecated
          */
-        getAllAdmins() {
-            return Admin.findAdmins();
-        },
+        // getAllAdmins() {
+        //     return Admin.findAdmins();
+        // }
+        ,
         /**
          * @async
          * @function getPeriodEmotions This function is used to get all the emotions during a given period, e.g.. from 31/1/2020 --- 2/2/2020,
