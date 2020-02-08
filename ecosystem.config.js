@@ -1,8 +1,8 @@
 module.exports = {
   apps : [{
-    name: 'API',
+    name: 'theFifthAPI',
     script: './server.js',
-    exec_mode : "cluster",
+    exec_mode : "cluster_mode",
     // Options reference: https://pm2.keymetrics.io/docs/usage/application-declaration/
     args: 'one two',
     instances: "max",

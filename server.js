@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 4000;
 
 const app = express();
 app.use(express.json());
-dotenv.config({ path: './.env' });
+dotenv.config({ path: './config.env' });
 const server = new ApolloServer({
     typeDefs,
     resolvers
@@ -32,6 +32,5 @@ mongoose.connect(process.env.DATABASE_URL, {
 });
 
 app.listen({ port: PORT }, () => {
-    console.log(process.env.DATABASE_URL);
     console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`);
 });
