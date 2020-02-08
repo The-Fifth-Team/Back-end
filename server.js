@@ -16,7 +16,6 @@ const server = new ApolloServer({
 });
 
 server.applyMiddleware({ app });
-
 mongoose.Promise = global.Promise;
 // Mongodb connection//
 mongoose.connect(process.env.DATABASE_URL, {
@@ -32,8 +31,6 @@ mongoose.connect(process.env.DATABASE_URL, {
     }
 });
 
-
 app.listen({ port: PORT }, () => {
-    console.log(process.env.DATABASE_URL);
     console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`);
 });
