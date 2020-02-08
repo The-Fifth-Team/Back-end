@@ -35,7 +35,9 @@ export default function (whatYouRecievFromTheFrontEnd) {
 
     const bestMatch = faceMatcher.findBestMatch(whatYouRecievFromTheFrontEnd)
     if (bestMatch.toString().toLowerCase() !== "unknown"){
-      return true
+      return bestMatch.toString()
+    }
+    return new Error("User not identified")
     }
     return false
   }
