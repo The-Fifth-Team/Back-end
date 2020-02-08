@@ -38,5 +38,7 @@ export default function (whatYouRecievFromTheFrontEnd) {
       return bestMatch.toString()
     }
     return new Error("User not identified")
+    }
+    return false
   }
 }
