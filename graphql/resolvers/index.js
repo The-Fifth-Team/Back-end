@@ -20,7 +20,7 @@ const resolvers = {
         /**
          * @async
          * @function uploadUser used to save a user to the database of the system with his/her photo and face descriptors
-         * @param parent pointer which points to the parent function which called this function (IF EXISTS)
+         * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data  the object that contains the data needed for this mutation
          * @return {Promise<object|Error>} user  the User that get saved to the database, return Error if problem occurred
          * @author Abobker Elaghel
@@ -64,7 +64,7 @@ const resolvers = {
         },
         /**
          * @function addAdmin used to add an admin to the database
-         * @param parent pointer which points to the parent function which called this function (IF EXISTS)
+         * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data  the object that contains the data needed for this mutation, admin object
          * @return {Promise<object|Error>} the admin that get saved to the database, return Error if problem occurred
          * @author Abobker Elaghel
@@ -72,6 +72,17 @@ const resolvers = {
          */
         addAdmin(parent, { data }) {
             return Admin.createAdmin(data);
+        },
+        /**
+         * @async
+         * @function userFaceIdentifier
+         * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
+         * @param {object} data  the object that contains the data needed for this mutation
+         * @return {Promise<object|Error>}
+         * @since 1.0.0
+         */
+        async userFaceIdentifier(parent, {data}){
+            const allDescriptors = await Descriptor.findAllDescriptors();
         }
     },
     Query: {
