@@ -3,7 +3,7 @@ const User = require('../../Models/User');
 const Admin = require('../../Models/Admin');
 const Emotion = require('../../Models/Emotion');
 const Descriptor = require('../../Models/Descriptors');
-
+const recognizerService = require('../../services/recognizer/recognizer');
 //This is the Configuration for the the Cloudniray services
 //to be able to save images online
 cloudinary.config({
@@ -83,6 +83,7 @@ const resolvers = {
          */
         async userFaceIdentifier(parent, {data}){
             const allDescriptors = await Descriptor.findAllDescriptors();
+
         }
     },
     Query: {
