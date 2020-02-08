@@ -13,7 +13,6 @@ const typeDefs = gql `
 
   type Query{
     getAllUsers: [User]!
-    getAllAdmins: [Admin]!
     getPeriodEmotions(startDate: String!, endDate: String!): RiverChartReturnType
   }
 
@@ -60,7 +59,6 @@ const typeDefs = gql `
     fearful: Float
     disgusted: Float
     surprised: Float
-    userId: ID!
   }
 
   type Emotion {
