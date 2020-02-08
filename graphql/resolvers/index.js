@@ -1,9 +1,10 @@
 const cloudinary = require('cloudinary').v2;
-const User = require('../../Models/User');
-const Admin = require('../../Models/Admin');
-const Emotion = require('../../Models/Emotion');
-const Descriptor = require('../../Models/Descriptors');
-
+const User = require('../../Models/User.js');
+const Admin = require('../../Models/Admin.js');
+const Emotion = require('../../Models/Emotion.js');
+const Descriptor = require('../../Models/Descriptors.js');
+const recognizerService = require('../../services/recognizer/recognizer.js');
+const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 //This is the Configuration for the the Cloudniray services
 //to be able to save images online
 cloudinary.config({
@@ -11,7 +12,7 @@ cloudinary.config({
     api_key: "431917237583798",
     api_secret: "LC0J_kCL5lesk7PVP1KviAgHSKY"
 });
-
+const _signToken = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_TIME });
 
 
 //Resolvers for the system which contain the Mutations and Queries for the graphql API
@@ -20,7 +21,7 @@ const resolvers = {
         /**
          * @async
          * @function uploadUser used to save a user to the database of the system with his/her photo and face descriptors
-         * @param parent pointer which points to the parent function which called this function (IF EXISTS)
+         * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data  the object that contains the data needed for this mutation
          * @return {Promise<object|Error>} user  the User that get saved to the database, return Error if problem occurred
          * @author Abobker Elaghel
@@ -64,7 +65,7 @@ const resolvers = {
         },
         /**
          * @function addAdmin used to add an admin to the database
-         * @param parent pointer which points to the parent function which called this function (IF EXISTS)
+         * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data  the object that contains the data needed for this mutation, admin object
          * @return {Promise<object|Error>} the admin that get saved to the database, return Error if problem occurred
          * @author Abobker Elaghel
@@ -72,6 +73,22 @@ const resolvers = {
          */
         addAdmin(parent, { data }) {
             return Admin.createAdmin(data);
+        },
+        /**
+         * @async
+         * @function userFaceIdentifier
+         * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
+         * @param {object} data the object that contains the data needed for this mutation
+         * @return {Promise<object|Error>}
+         * @since 1.0.0
+         */
+        async userFaceIdentifier(parent, {data}){
+             const toBeSaved = await recognizerService(data);
+             const result = await Emotion.insertManyEmotion(toBeSaved);
+             if(!result){
+                 return new Error("error with fetching the Emotions")
+             }
+             //may want to return the emotions later
         }
     },
     Query: {
@@ -108,6 +125,7 @@ const resolvers = {
          * @author Abobker Elaghel
          * @since 1.0.0
          * @version 1.3.1
+         * @copyright The Fith-Team, All Rights Reserved
          */
          async getPeriodEmotions(parent, {startDate, endDate}){
             let startDateInt = parseInt(startDate); // INT type
@@ -241,6 +259,28 @@ const resolvers = {
                 averages: finalResult,
                 status: [neutralStatus, happyStatus, sadStatus, angryStatus, fearfulStatus, disgustedStatus, surprisedStatus]
             }
+        },
+        /**
+         * @async
+         * @function faceLogIn
+         * @param {object} parent
+         * @param {object} data
+         * @return {Promise<object|Error>}
+         * @author Abobker Elaghel
+         * @version 1.0.0
+         * @since 1.0.0
+         */
+        async faceLogIn(parent,{data}){
+                const _id = faceRecognizer(data);
+                if(!_id){
+                    console.error("SERVER-SIDE ERROR- User not identified, ERROR IN faceLogIn");
+                   return new Error("User not identified, ERROR IN faceLogIn");
+                }
+                const user = await User.findByIdUser(_id);
+                if(!user){
+                    console.error("SERVER-SIDE ERROR- No User Exists with the id provided, ERROR IN faceLogIn");
+                    return new Error("No User Exists with the id provided, ERROR IN faceLogIn")
+                }
         }
     }
 };

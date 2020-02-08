@@ -45,7 +45,7 @@ module.exports.updateOneUser = (_id, objectCriteria) => {
     return User.findByIdAndUpdate(_id, objectCriteria)
 };
 
-module.exports.findOneUser = _id => {
+module.exports.findByIdUser = _id => {
     return User.findById(_id);
 };
 

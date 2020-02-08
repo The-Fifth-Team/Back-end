@@ -18,13 +18,18 @@
     },
     "homepage": "https://github.com/The-Fifth-Team/Back-end#readme",
     "dependencies": {
+        "@tensorflow/tfjs-node": "^1.5.2",
+        "apollo-server": "^2.10.0",
         "apollo-server-express": "^2.9.16",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.19.0",
+        "canvas": "^2.6.1",
+        "cloudinary": "^1.14.0",
         "dotenv": "^8.2.0",
         "express": "^4.17.1",
         "express-graphql": "^0.9.0",
-        "cloudinary": "^1.14.0",
+        "face-api.js": "^0.22.1",
+        "faceapi": "^1.0.1",
         "graphql": "^14.5.8",
         "json2csv": "^4.5.4",
         "mocha": "^7.0.0",
@@ -35,6 +40,7 @@
         "validator": "^12.1.0"
     },
     "devDependencies": {
-        "apollo-server": "^2.10.0"
+        "apollo-server": "^2.10.0",
+        "jsonwebtoken": "^8.5.1"
     }
 }
