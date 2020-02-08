@@ -1,4 +1,5 @@
 const cloudinary = require('cloudinary').v2;
+const jwt = require('jsonwebtoken');
 const User = require('../../Models/User.js');
 const Admin = require('../../Models/Admin.js');
 const Emotion = require('../../Models/Emotion.js');
@@ -8,9 +9,9 @@ const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 //This is the Configuration for the the Cloudniray services
 //to be able to save images online
 cloudinary.config({
-    cloud_name: "dwtaamxgn",
-    api_key: "431917237583798",
-    api_secret: "LC0J_kCL5lesk7PVP1KviAgHSKY"
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.PHOTO_CLOUD_API_KEY,
+    api_secret: process.env.PHOTO_CLOUD_API_SECRET
 });
 const _signToken = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_TIME });
 

@@ -1,2 +1,4 @@
 node_modules
 confing/config.js
+.env
+config.env
