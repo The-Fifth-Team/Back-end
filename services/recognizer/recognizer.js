@@ -38,11 +38,11 @@ export default function (whatYouRecievFromTheFrontEnd) {
       const bestMatch = faceMatcher.findBestMatch(fd.descriptor)
       obj.userId = bestMatch.toString();
       obj.neutral = fd.expressions.neutral;
-      obj.angry = fd.expressions.angry;
-      obj.disgust = fd.expressions.disgust;
       obj.happy = fd.expressions.happy;
-      obj.fear = fd.expressions.fear;
       obj.sad = fd.expressions.sad;
+      obj.angry = fd.expressions.angry;
+      obj.fearful = fd.expressions.fear;
+      obj.disgusted = fd.expressions.disgust;
       obj.surprised = fd.expressions.surprised;
       toBeSavedtoDB.push(obj)
     })
