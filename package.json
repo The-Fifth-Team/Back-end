@@ -5,7 +5,7 @@
     "main": "server.js",
     "scripts": {
         "test": "mocha",
-        "start": "pm2-runtime start ecosystem.config.js"
+        "start": "node server.js"
     },
     "repository": {
         "type": "git",
