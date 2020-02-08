@@ -2,29 +2,30 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 
 const userSchema = mongoose.Schema({
-  firstName: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  lastName: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  age: {
-    type: Number,
-    required: true,
-  },
-  gender: {
-    type: String,
-    required: true,
-    trim: true,
-  }
+    firstName: {
+        type: String,
+        required: [true, "firstName is Required"],
+        trim: true,
+    },
+    lastName: {
+        type: String,
+        required: [true, "lastName is Required"],
+        trim: true,
+    },
+    age: {
+        type: Number,
+        enum: ['Male', 'Female'],
+        required: [true, "age is Required"],
+    },
+    gender: {
+        type: String,
+        required: [true, "gender is Required"],
+        trim: true,
+    },
+    photoUrl: {
+        type: String,
+        trim: true
+    }
 });
 
 const User = new mongoose.model('User', userSchema);
@@ -44,29 +45,28 @@ const User = new mongoose.model('User', userSchema);
 
 // This function works now and ready to export
 // but we might add the biometrically so it needs more work!
-module.exports.insertUser = ( userData ) => {
-  return User.create(userData);
+module.exports.insertUser = (userData) => {
+    return User.create(userData);
 };
 
 // Delete user ready to export it recieve user id and delete it from db ..
-module.exports.deleteUser = ( userId ) => {
-  return User.findByIdAndDelete( userId )
+module.exports.deleteUser = (userId) => {
+    return User.findByIdAndDelete(userId)
 };
 
 // This function accept userId, as target and object criteria
 // ex { name: 'Ali jalal' } this will target the user by id
 // and set his name to the object criteria ...
 module.exports.updateOneUser = (userId, objectCriteria) => {
-  return User.findByIdAndUpdate({ _id: userId },  objectCriteria )
+    return User.findByIdAndUpdate({ _id: userId }, objectCriteria)
 };
 
 // Retreve user by Id
-module.exports.getUser = ( userId ) => {
-  return User.findOne({ _id: userId })
+module.exports.getUser = (userId) => {
+    return User.findOne({ _id: userId })
 };
 
 // Retrieve all users
 module.exports.getUsers = () => {
-  return User.find()
+    return User.find()
 };
-

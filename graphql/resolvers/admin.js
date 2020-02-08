@@ -1,5 +1,6 @@
 const AdminFunctions = require('../../Models/Admin');
 const sendEmail = require('../../helper_function/sendEmail');
+const bcrypt = require('bcryptjs');
 module.exports = {
     Mutation: {
         async forgetPassword(parent, { email }) {
@@ -40,8 +41,6 @@ module.exports = {
             admin.passwordResetTokenExpired = undefined;
             admin.passwordResetToken = undefined;
             await admin.save();
-
-            //should return new Sign in token//
         }
     }
 };
