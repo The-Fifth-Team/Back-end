@@ -41,7 +41,6 @@
         "validator": "^12.1.0"
     },
     "devDependencies": {
-        "apollo-server": "^2.10.0",
-
+        "apollo-server": "^2.10.0"
     }
 }
