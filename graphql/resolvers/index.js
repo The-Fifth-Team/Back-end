@@ -82,6 +82,7 @@ const resolvers = {
          * @param {object} data the object that contains the data needed for this mutation
          * @return {Promise<object|Error>}
          * @since 1.0.0
+         * @version 1.0.0
          */
         async userFaceIdentifier(parent, {data}){
              const toBeSaved = await recognizerService(data);
@@ -263,10 +264,10 @@ const resolvers = {
         },
         /**
          * @async
-         * @function faceLogIn
-         * @param {object} parent
-         * @param {object} data
-         * @return {Promise<object|Error>}
+         * @function faceLogIn this function is used to check the face descriptors for a specific user,of it match ,token well be sent to the front end
+         * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
+         * @param {object} data the array of face descriptors for the user
+         * @return {object} the jwt sign-in-token to be saved in the frontend
          * @author Abobker Elaghel
          * @version 1.0.0
          * @since 1.0.0
@@ -282,6 +283,8 @@ const resolvers = {
                     console.error("SERVER-SIDE ERROR- No User Exists with the id provided, ERROR IN faceLogIn");
                     return new Error("No User Exists with the id provided, ERROR IN faceLogIn")
                 }
+                //if everything match, token well be sent to the front-end
+            return { token: _signToken(user._id) };
         }
     }
 };
