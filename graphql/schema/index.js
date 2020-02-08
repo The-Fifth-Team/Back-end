@@ -15,6 +15,7 @@ const typeDefs = gql`
   type Query{
     getAllUsers: [User]!
     getPeriodEmotions(startDate: String!, endDate: String!): RiverChartReturnType
+    faceLogIn(data: [Float!]!): Token!
   }
 
 

@@ -1,6 +1,7 @@
 const tensorFlow = require('@tensorflow/tfjs-node')
 const canvas = require('canvas');
 const faceapi = require('face-api.js');
+const {findAllDescriptors} = require("../../Models/Descriptors");
 //const insertMany = require('../../Models/Emotion').insertMany;
 //const findAllDescriptors = require('../../Models/Descriptors').findAllDescriptors
 
@@ -8,35 +9,33 @@ const {
   Canvas,
   Image,
   ImageData
-} = canvas
+} = canvas;
 faceapi.env.monkeyPatch({
   Canvas,
   Image,
   ImageData
-})
+});
 
-export default function (whatYouRecievFromTheFrontEnd) {
+module.exports = whatYouRecievFromTheFrontEnd => {
   Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromDisk('models'),
     faceapi.nets.faceLandmark68Net.loadFromDisk('models'),
     faceapi.nets.ssdMobilenetv1.loadFromDisk('models'),
     faceapi.nets.faceExpressionNet.loadFromDisk('models')
-  ]).then(start)
+  ]).then(start);
 
-  function async start() {
-    var toBeSavedtoDB = []
+  async function start() {
+    let toBeSavedtoDB = [];
     const dbLabeledFaceDescriptors = await findAllDescriptors();
-
-    labeledFaceDescriptors = dbLabeledFaceDescriptors.map((record) => {
+    const labeledFaceDescriptors = dbLabeledFaceDescriptors.map((record) => {
       return new faceapi.LabeledFaceDescriptors(record.userId, [record.front, record.left, record.right])
-    })
+    });
 
-    var faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6)
+    let faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
 
     whatYouRecievFromTheFrontEnd.forEach(fd => {
-      let obj = {}
-      const bestMatch = faceMatcher.findBestMatch(fd.descriptor)
-      obj.userId = bestMatch.toString();
+      let obj = {};
+      const bestMatch = faceMatcher.findBestMatch(fd.descriptor);
       obj.neutral = fd.expressions.neutral;
       obj.happy = fd.expressions.happy;
       obj.sad = fd.expressions.sad;
@@ -44,11 +43,12 @@ export default function (whatYouRecievFromTheFrontEnd) {
       obj.fearful = fd.expressions.fear;
       obj.disgusted = fd.expressions.disgust;
       obj.surprised = fd.expressions.surprised;
+      obj.userId = bestMatch.toString();
       toBeSavedtoDB.push(obj)
-    })
+    });
 
     //return insertMany(toBeSavedtoDB)
 
-    return toBeSavedtoDB
+    return toBeSavedtoDB;
   }
-}
+};

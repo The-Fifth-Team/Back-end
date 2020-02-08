@@ -77,13 +77,17 @@ const resolvers = {
          * @async
          * @function userFaceIdentifier
          * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
-         * @param {object} data  the object that contains the data needed for this mutation
+         * @param {object} data the object that contains the data needed for this mutation
          * @return {Promise<object|Error>}
          * @since 1.0.0
          */
         async userFaceIdentifier(parent, {data}){
-            const allDescriptors = await Descriptor.findAllDescriptors();
-
+             const toBeSaved = recognizerService(data);
+             const result = await Emotion.insertManyEmotion(data);
+             if(!result){
+                 return new Error("error with fetching the Emotions")
+             }
+             //may want to return the emotions later
         }
     },
     Query: {
@@ -253,6 +257,18 @@ const resolvers = {
                 averages: finalResult,
                 status: [neutralStatus, happyStatus, sadStatus, angryStatus, fearfulStatus, disgustedStatus, surprisedStatus]
             }
+        },
+        /**
+         * @function faceLogIn
+         * @param {object} parent
+         * @param {object} data
+         * @return {Promise<object|Error>}
+         * @author Abobker Elaghel
+         * @version 1.0.0
+         * @since 1.0.0
+         */
+        faceLogIn(parent,{data}){
+
         }
     }
 };
