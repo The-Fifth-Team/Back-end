@@ -1,9 +1,10 @@
 const cloudinary = require('cloudinary').v2;
-const User = require('../../Models/User');
-const Admin = require('../../Models/Admin');
-const Emotion = require('../../Models/Emotion');
-const Descriptor = require('../../Models/Descriptors');
-const recognizerService = require('../../services/recognizer/recognizer');
+const User = require('../../Models/User.js');
+const Admin = require('../../Models/Admin.js');
+const Emotion = require('../../Models/Emotion.js');
+const Descriptor = require('../../Models/Descriptors.js');
+const recognizerService = require('../../services/recognizer/recognizer.js');
+const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 //This is the Configuration for the the Cloudniray services
 //to be able to save images online
 cloudinary.config({
@@ -11,7 +12,7 @@ cloudinary.config({
     api_key: "431917237583798",
     api_secret: "LC0J_kCL5lesk7PVP1KviAgHSKY"
 });
-
+const _signToken = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_TIME });
 
 
 //Resolvers for the system which contain the Mutations and Queries for the graphql API
@@ -82,8 +83,8 @@ const resolvers = {
          * @since 1.0.0
          */
         async userFaceIdentifier(parent, {data}){
-             const toBeSaved = recognizerService(data);
-             const result = await Emotion.insertManyEmotion(data);
+             const toBeSaved = await recognizerService(data);
+             const result = await Emotion.insertManyEmotion(toBeSaved);
              if(!result){
                  return new Error("error with fetching the Emotions")
              }
@@ -124,6 +125,7 @@ const resolvers = {
          * @author Abobker Elaghel
          * @since 1.0.0
          * @version 1.3.1
+         * @copyright The Fith-Team, All Rights Reserved
          */
          async getPeriodEmotions(parent, {startDate, endDate}){
             let startDateInt = parseInt(startDate); // INT type
@@ -259,6 +261,7 @@ const resolvers = {
             }
         },
         /**
+         * @async
          * @function faceLogIn
          * @param {object} parent
          * @param {object} data
@@ -267,8 +270,17 @@ const resolvers = {
          * @version 1.0.0
          * @since 1.0.0
          */
-        faceLogIn(parent,{data}){
-
+        async faceLogIn(parent,{data}){
+                const _id = faceRecognizer(data);
+                if(!_id){
+                    console.error("SERVER-SIDE ERROR- User not identified, ERROR IN faceLogIn");
+                   return new Error("User not identified, ERROR IN faceLogIn");
+                }
+                const user = await User.findByIdUser(_id);
+                if(!user){
+                    console.error("SERVER-SIDE ERROR- No User Exists with the id provided, ERROR IN faceLogIn");
+                    return new Error("No User Exists with the id provided, ERROR IN faceLogIn")
+                }
         }
     }
 };
