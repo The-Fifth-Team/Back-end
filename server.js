@@ -12,7 +12,10 @@ app.use(express.json());
 dotenv.config({ path: './config.env' });
 const server = new ApolloServer({
     typeDefs,
-    resolvers
+    resolvers,
+    context: ({req}) => {
+        return { token : req.headers["authorization"]};
+    }
 });
 
 server.applyMiddleware({ app });
