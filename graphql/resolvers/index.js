@@ -1,4 +1,5 @@
 const cloudinary = require('cloudinary').v2;
+const jwt = require('jsonwebtoken');
 const User = require('../../Models/User.js');
 const Admin = require('../../Models/Admin.js');
 const Emotion = require('../../Models/Emotion.js');
@@ -7,13 +8,27 @@ const recognizerService = require('../../services/recognizer/recognizer.js');
 const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 //This is the Configuration for the the Cloudniray services
 //to be able to save images online
-cloudinary.config({
-    cloud_name: "dwtaamxgn",
-    api_key: "431917237583798",
-    api_secret: "LC0J_kCL5lesk7PVP1KviAgHSKY"
-});
-const _signToken = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_TIME });
 
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.PHOTO_CLOUD_API_KEY,
+    api_secret: process.env.PHOTO_CLOUD_API_SECRET
+});
+
+/**
+ * @function _signToken - used to sign a jwt token, based on a specific string
+ * @param {string} id - the id of the user, to create the hash, based on it
+ * @return {string} - hashed token to be returned
+ * @private
+ */
+const _signToken = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_TIME });
+/**
+ * @function _verifyToken - used to verify the jwt token and return payload of everything match's
+ * @param token - the token to be verified
+ * @return {object} - object payload that corresponds to the token sent
+ * @private
+ */
+const _verifyToken = token => jwt.verify(token, process.env.JWT_SECRET);
 
 //Resolvers for the system which contain the Mutations and Queries for the graphql API
 const resolvers = {
@@ -27,7 +42,7 @@ const resolvers = {
          * @author Abobker Elaghel
          * @since 1.0.0
          */
-        async uploadUser(parent, { data }) {
+        async uploadUser(parent, { data },) {
             const { filename, createReadStream } = await data.photo;
             try {
                 const result = await new Promise((resolve, reject) => {
@@ -76,11 +91,11 @@ const resolvers = {
         },
         /**
          * @async
-         * @function userFaceIdentifier
+         * @function userFaceIdentifier checks the emotions sent from the front-end,and identify for who they belong
          * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data the object that contains the data needed for this mutation
-         * @return {Promise<object|Error>}
          * @since 1.0.0
+         * @version 1.0.0
          */
         async userFaceIdentifier(parent, {data}){
              const toBeSaved = await recognizerService(data);
@@ -89,6 +104,26 @@ const resolvers = {
                  return new Error("error with fetching the Emotions")
              }
              //may want to return the emotions later
+        },
+
+        /**
+         * @async
+         * @function signInAdmin - used to verify an admin sign_in and return token of valid
+         * @param {object} parent - pointer which points to the parent function which called this function (IF EXISTS)
+         * @param email - email of the admin
+         * @param password - password of the admin
+         * @return {Promise<{token: string}|Error>} - jwt token, built based on the admin object id
+         */
+        async signInAdmin (parent, { email, password }){
+            const admin = await Admin.findOneAdmin({email});
+            if(!admin){
+                return new Error("Error with admin Email OR Password");
+            }
+            const isValid = await bcrypt.compare(password, admin.password);
+            if(!isValid){
+                return new Error("Error with admin Email OR Password");
+            }
+            return {token : _signToken(admin._id)};
         }
     },
     Query: {
@@ -118,16 +153,20 @@ const resolvers = {
          * and also return the Noise in that Period,i.e.. the Anomaly emotions, or in other words the abnormality in the result, during that period
          * it returns an array of emotions separated by a TIME GAP between each array, e.g.. 15min gaps meaning it well return multiple arrays of emotions that occurs in 8:00 through 8:15
          * and then other array in the period 8:15 -> 8:30 and so on, so that a 15min time gap, then, calculate all their averages and return them along with the noise
-         * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
-         * @param {string} startDate the start date in stringified format
-         * @param {string} endDate the end date in stringified format
+         * @param {object} parent - pointer which points to the parent function which called this function (IF EXISTS)
+         * @param {string} startDate - the start date in stringified format
+         * @param {string} endDate - the end date in stringified format
+         * @param token - the admin token sent from the front-end
          * @return {Promise<object|Error>} object contains the array of arrays of the averages, and the Noise Emotions
          * @author Abobker Elaghel
          * @since 1.0.0
          * @version 1.3.1
-         * @copyright The Fith-Team, All Rights Reserved
          */
-         async getPeriodEmotions(parent, {startDate, endDate}){
+         async getPeriodEmotions(parent, {startDate, endDate},{ token }){
+            // let admin = await Admin.findByIdAdmin( _verifyToken(token)._id );
+            // if(!admin){
+            //     return new Error("Authorized Personnel Only!")
+            // }
             let startDateInt = parseInt(startDate); // INT type
             let endDateInt = parseInt(endDate); // INT type
             startDate = new Date(startDateInt); // Date type
@@ -262,10 +301,10 @@ const resolvers = {
         },
         /**
          * @async
-         * @function faceLogIn
-         * @param {object} parent
-         * @param {object} data
-         * @return {Promise<object|Error>}
+         * @function faceLogIn this function is used to check the face descriptors for a specific user,of it match ,token well be sent to the front end
+         * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
+         * @param {object} data the array of face descriptors for the user
+         * @return {object} the jwt sign-in-token to be saved in the frontend
          * @author Abobker Elaghel
          * @version 1.0.0
          * @since 1.0.0
@@ -281,6 +320,8 @@ const resolvers = {
                     console.error("SERVER-SIDE ERROR- No User Exists with the id provided, ERROR IN faceLogIn");
                     return new Error("No User Exists with the id provided, ERROR IN faceLogIn")
                 }
+                //if everything match, token well be sent to the front-end
+            return { token: _signToken(user._id) };
         }
     }
 };

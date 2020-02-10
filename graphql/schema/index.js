@@ -3,19 +3,20 @@ const { gql } = require('apollo-server');
 const typeDefs = gql`
 
   type Token {
-    token: String
+  token: String!
   }
 
   type Mutation {
-    uploadUser(data: UserInput!): User!
+    uploadUser(data: UserInput!): User
     addAdmin(data: AdminInput!): Admin!
     userFaceIdentifier(data: [ObservationInput]): Emotion
+    signInAdmin(email: String!, password: String!): Token
   }
 
   type Query{
     getAllUsers: [User]!
     getPeriodEmotions(startDate: String!, endDate: String!): RiverChartReturnType
-    faceLogIn(data: [Float!]!): Token!
+    faceLogIn(data: [Float!]!): Token
   }
 
 
@@ -29,7 +30,7 @@ const typeDefs = gql`
   type Admin {
     firstName: String
     lastName: String
-    email: String
+    email: String 
     createdAt: String
   }
 

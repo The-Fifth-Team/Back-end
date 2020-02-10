@@ -32,6 +32,8 @@
         "faceapi": "^1.0.1",
         "graphql": "^14.5.8",
         "json2csv": "^4.5.4",
+        "jsonwebtoken": "^8.5.1",
+        "memcached": "^2.2.2",
         "mocha": "^7.0.0",
         "moment": "^2.24.0",
         "mongoose": "^5.8.9",
@@ -40,7 +42,6 @@
         "validator": "^12.1.0"
     },
     "devDependencies": {
-        "apollo-server": "^2.10.0",
-        "jsonwebtoken": "^8.5.1"
+        "apollo-server": "^2.10.0"
     }
 }

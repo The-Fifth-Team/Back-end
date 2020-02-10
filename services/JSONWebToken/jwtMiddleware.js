@@ -6,7 +6,7 @@ let verifyToken = (req, res, next) => {
 
   const verified = jwt.verify(
     token,
-    process.env.JWT_SECRET || "TheFifthTeamIsTheBestTeam",
+    process.env.JWT_SECRET,
     (err, user) => {
       if (err) return res.status(401).send("Please Login");
       req.user = user;
