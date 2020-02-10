@@ -114,7 +114,7 @@ const resolvers = {
          * @param password - password of the admin
          * @return {Promise<{token: string}|Error>} - jwt token, built based on the admin object id
          */
-        async signInAdmin (parent, {email, password}){
+        async signInAdmin (parent, { email, password }){
             const admin = await Admin.findOneAdmin({email});
             if(!admin){
                 return new Error("Error with admin Email OR Password");

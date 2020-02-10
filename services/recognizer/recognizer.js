@@ -26,8 +26,12 @@ module.exports = whatYouRecievFromTheFrontEnd => {
 
   async function start() {
     let toBeSavedtoDB = [];
+    //Here is where the caching system should take place, taking the data from the cache,
     const dbLabeledFaceDescriptors = await findAllDescriptors();
-    const labeledFaceDescriptors = dbLabeledFaceDescriptors.map((record) => {
+    //cache the dbLabeledFaceDescriptors Of not changed, of changed fetch'em from the database//
+    //OR//
+
+    const labeledFaceDescriptors = dbLabeledFaceDescriptors.map( record => {
       return new faceapi.LabeledFaceDescriptors(record.userId, [record.front, record.left, record.right])
     });
 
