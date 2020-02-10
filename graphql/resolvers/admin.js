@@ -42,6 +42,7 @@ module.exports = {
                 if (!admin) {
                     return new Error("Token is invalid or Expired");
                 }
+
                 return hashedToken;
             } else {
                 return new Error("No Token is provided")

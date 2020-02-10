@@ -4,22 +4,24 @@ const dotenv = require('dotenv');
 const { ApolloServer } = require('apollo-server-express');
 const typeDefs = require('./graphql/schema');
 const resolvers = require('./graphql/resolvers');
-const { deleteUser } = require('./Models/User');
-const { existsSync, mkdirSync } = require("fs");
+
 const PORT = process.env.PORT || 4000;
+
 const app = express();
 app.use(express.json());
-dotenv.config({ path: '../config.env' });
+dotenv.config({ path: './config.env' });
 const server = new ApolloServer({
     typeDefs,
-    resolvers
+    resolvers,
+    context: ({req}) => {
+        return { token : req.headers["authorization"]};
+    }
 });
 
 server.applyMiddleware({ app });
-
 mongoose.Promise = global.Promise;
 // Mongodb connection//
-mongoose.connect('mongodb+srv://ali-jalal:thefifthteam@cluster0-p3vu6.mongodb.net/test?retryWrites=true&w=majority', {
+mongoose.connect(process.env.DATABASE_URL, {
     useCreateIndex: true,
     useNewUrlParser: true,
     useFindAndModify: false,
@@ -31,7 +33,6 @@ mongoose.connect('mongodb+srv://ali-jalal:thefifthteam@cluster0-p3vu6.mongodb.ne
         console.log('Connected to Database');
     }
 });
-
 
 app.listen({ port: PORT }, () => {
     console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`);
