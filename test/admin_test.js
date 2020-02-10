@@ -1,7 +1,7 @@
 const assert = require('assert');
 const Admin = require('../Models/Admin.js');
 
-describe("Admin CRUD operations" , () => {
+describe ("Admin CRUD operations" , () => {
 
   it("Create a Admin", (done) => {
     const testObject = {firstName:"Abobker", lastName:"Abobker", password:"Abobker", email:"Abobker@gmail.com"};
@@ -14,6 +14,7 @@ describe("Admin CRUD operations" , () => {
     })
   });
 });
+
 
 describe("", () => {
 

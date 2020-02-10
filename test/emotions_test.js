@@ -1,5 +1,5 @@
 const assert = require('assert');
-const Emotions = require('../Models/Emotions.js');
+const Emotions = require('../Models/Emotion.js');
 
 describe("Emotions CRUD operations", () => {
     it("insertMany" , done => {
@@ -28,7 +28,7 @@ describe("Emotions CRUD operations", () => {
 });
 describe("", () => {
 
-    beforeEach((done) => {
+    beforeEach( done => {
         const testObject = {neutral:1, angry:0, disgust:0, happy:0, fear:0, sad:0, surprised:0, userId:null};
         Emotions.insertOne(testObject).then(data => {
             assert(!!data);
