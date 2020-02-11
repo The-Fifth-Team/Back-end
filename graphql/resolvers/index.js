@@ -8,6 +8,7 @@ const recognizerService = require('../../services/recognizer/recognizer.js');
 const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 //This is the Configuration for the the Cloudniray services
 //to be able to save images online
+require('../../SERVER_CACHE_MEMORY');
 
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
@@ -39,7 +40,6 @@ const resolvers = {
          * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data  the object that contains the data needed for this mutation
          * @return {Promise<object|Error>} user  the User that get saved to the database, return Error if problem occurred
-         * @author Abobker Elaghel
          * @since 1.0.0
          */
         async uploadUser(parent, { data },) {
@@ -71,6 +71,11 @@ const resolvers = {
                     left: data.descriptors[1],
                     right: data.descriptors[2]
                 });
+
+                // deletes the key for descriptors, because the cache now does not contain the most updated version of the descriptors
+                SERVER_CACHE_MEMORY.del(process.env.DESCRIPTOR_KEY);
+                //this should be added to any function that well manipulate the descriptors, collations EXCEPT for querying and reading functions
+
                 console.log("Inserted Successful");
                 return user;
             } catch (err) {
@@ -83,7 +88,6 @@ const resolvers = {
          * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data  the object that contains the data needed for this mutation, admin object
          * @return {Promise<object|Error>} the admin that get saved to the database, return Error if problem occurred
-         * @author Abobker Elaghel
          * @since 1.0.0
          */
         addAdmin(parent, { data }) {
@@ -130,7 +134,6 @@ const resolvers = {
         /**
          * @function getAllUsers used to pull all the users from the database
          * @return {Promise<object|Error>} all the users that exists in the database, return Error if problem occurred
-         * @author Abobker Elaghel
          * @since 1.0.0
          */
         getAllUsers() {
@@ -139,7 +142,6 @@ const resolvers = {
         /**
          * @function getAllAdmins pulls all the admin from the database
          * @return {Promise<object|Error>} all the admins that exists in the database, return Error if problem occurred
-         * @author Abobker Elaghel
          * @since 1.0.0
          * @deprecated
          */
@@ -158,7 +160,6 @@ const resolvers = {
          * @param {string} endDate - the end date in stringified format
          * @param token - the admin token sent from the front-end
          * @return {Promise<object|Error>} object contains the array of arrays of the averages, and the Noise Emotions
-         * @author Abobker Elaghel
          * @since 1.0.0
          * @version 1.3.1
          */
@@ -305,7 +306,6 @@ const resolvers = {
          * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data the array of face descriptors for the user
          * @return {object} the jwt sign-in-token to be saved in the frontend
-         * @author Abobker Elaghel
          * @version 1.0.0
          * @since 1.0.0
          */
