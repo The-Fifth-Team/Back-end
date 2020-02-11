@@ -101,6 +101,7 @@ const resolvers = {
          * @version 1.0.0
          */
         async userFaceIdentifier(parent, {data}){
+
              const toBeSaved = await recognizerService(data);
              const result = await Emotion.insertManyEmotion(toBeSaved);
              if(!result){
