@@ -17,7 +17,7 @@ const typeDefs = gql`
     getAllUsers: [User]!
     getPeriodEmotions(startDate: String!, endDate: String!): RiverChartReturnType
     faceLogIn(data: [Float!]!): Token
-    getEmotionAveragesForLast24Hours(): Emotion!
+    getEmotionAveragesForLast24Hours: Emotion!
   }
 
 
