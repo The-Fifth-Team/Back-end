@@ -79,3 +79,6 @@ module.exports.findByUserIdEmotion = userId => {
 module.exports.filterEmotionsByDate = date => {
     return Emotion.find({ createdAt: date })
 };
+module.exports.aggregate =  arrayOfOptions => {
+    return Emotion.aggregate(arrayOfOptions);
+};

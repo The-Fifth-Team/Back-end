@@ -322,6 +322,17 @@ const resolvers = {
                 }
                 //if everything match, token well be sent to the front-end
             return { token: _signToken(user._id) };
+        },
+        /**
+         * @async
+         * @function getEmotionAveragesForLast24Hours - return the averages of all the emotions that happened in the last 24 hours
+         * @return {object} - the object that contains the averages in the last hours
+         */
+        async getEmotionAveragesForLast24Hours(){
+            let result = await Emotion.aggregate([{$match:{createdAt:{$gte:new Date(Date.now()-(24*60*60*1000))}}},{$group:{_id:"",neutral:{$avg:"$neutral"},happy:{$avg:"$happy"},sad:{$avg:"$sad"},
+                    angry:{$avg:"$angry"},fearful:{$avg:"$fearful"},disgusted:{$avg:"$disgusted"},surprised:{$avg:"$surprised"}}}]);
+            delete result[0]["_id"];
+            return result[0];
         }
     }
 };
