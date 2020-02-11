@@ -6,6 +6,7 @@ const Emotion = require('../../Models/Emotion.js');
 const Descriptor = require('../../Models/Descriptors.js');
 const recognizerService = require('../../services/recognizer/recognizer.js');
 const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
+const json2csv = require('../../helper_function/json2csv');
 //This is the Configuration for the the Cloudniray services
 //to be able to save images online
 require('../../SERVER_CACHE_MEMORY');
@@ -71,11 +72,9 @@ const resolvers = {
                     left: data.descriptors[1],
                     right: data.descriptors[2]
                 });
-
                 // deletes the key for descriptors, because the cache now does not contain the most updated version of the descriptors
                 SERVER_CACHE_MEMORY.del(process.env.DESCRIPTOR_KEY);
                 //this should be added to any function that well manipulate the descriptors, collations EXCEPT for querying and reading functions
-
                 console.log("Inserted Successful");
                 return user;
             } catch (err) {
@@ -333,6 +332,34 @@ const resolvers = {
                     angry:{$avg:"$angry"},fearful:{$avg:"$fearful"},disgusted:{$avg:"$disgusted"},surprised:{$avg:"$surprised"}}}]);
             delete result[0]["_id"];
             return result[0];
+        },
+        /**
+         * @async
+         * @function getEmotionsCsvReport - used to return all the emotions in the database as a CSV report String
+         * @return {Promise<string>} - string contains a CSV report
+         */
+        async getEmotionsCsvReport(){
+            let emotions = await Emotion.findEmotions({}).populate("userId");
+            // Because of the others Hidden Attributes // Can Be seen by console.dir(nameOFYouVariable)
+            // i need to extract the attributes i need to run a loop
+            let result = [];
+            for (let i = 0; i < emotions.length ; i++) {
+                result.push(
+                    {
+                        userId: emotions[i].userId._id,
+                        firstName: emotions[i].userId.firstName,
+                        lastName: emotions[i].userId.lastName,
+                        gender: emotions[i].userId.gender,
+                        neutral: emotions[i].neutral,
+                        happy: emotions[i].happy,
+                        sad: emotions[i].sad,
+                        angry: emotions[i].angry,
+                        fearful: emotions[i].fearful,
+                        disgusted: emotions[i].disgusted,
+                        surprised: emotions[i].surprised
+                    })
+            }
+            return json2csv.json2CsvASync(result);
         }
     }
 };

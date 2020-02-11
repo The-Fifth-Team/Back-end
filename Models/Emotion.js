@@ -82,3 +82,5 @@ module.exports.filterEmotionsByDate = date => {
 module.exports.aggregate =  arrayOfOptions => {
     return Emotion.aggregate(arrayOfOptions);
 };
+
+module.exports.module = Emotion;
