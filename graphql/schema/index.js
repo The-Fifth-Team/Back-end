@@ -3,7 +3,7 @@ const { gql } = require('apollo-server');
 const typeDefs = gql`
 
   type Token {
-  token: String!
+    token: String!
   }
 
   type Mutation {
@@ -22,6 +22,9 @@ const typeDefs = gql`
     getEmotionsCsvReport: String!
   }
 
+  type Subscription {
+    faceDetected: Emotion!
+  }
 
   input AdminInput {
     firstName: String!
