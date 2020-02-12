@@ -2,8 +2,6 @@ const tensorFlow = require('@tensorflow/tfjs-node');
 const canvas = require('canvas');
 const faceapi = require('face-api.js');
 const {findAllDescriptors} = require("../../Models/Descriptors");
-//const insertMany = require('../../Models/Emotion').insertMany;
-//const findAllDescriptors = require('../../Models/Descriptors').findAllDescriptors
 require('../../SERVER_CACHE_MEMORY');
 
 const {
@@ -19,33 +17,44 @@ faceapi.env.monkeyPatch({
 
 module.exports = whatYouRecievFromTheFrontEnd => {
   Promise.all([
-    faceapi.nets.faceRecognitionNet.loadFromDisk('models'),
-    faceapi.nets.faceLandmark68Net.loadFromDisk('models'),
-    faceapi.nets.ssdMobilenetv1.loadFromDisk('models'),
-    faceapi.nets.faceExpressionNet.loadFromDisk('models')
-  ]).then(start);
+    faceapi.nets.faceRecognitionNet.loadFromDisk('models1'),
+    faceapi.nets.faceLandmark68Net.loadFromDisk('models1'),
+    faceapi.nets.ssdMobilenetv1.loadFromDisk('models1'),
+    faceapi.nets.faceExpressionNet.loadFromDisk('models1')
+  ])
+      .then(start())
+      .catch(err => {
+        console.log(err)
+      });
 
   async function start() {
     let toBeSavedtoDB = [];
     let labeledFaceDescriptors;
-
     if(SERVER_CACHE_MEMORY.has(process.env.DESCRIPTOR_KEY)){
       labeledFaceDescriptors = SERVER_CACHE_MEMORY.get(process.env.DESCRIPTOR_KEY);
     }else{
       const dbLabeledFaceDescriptors = await findAllDescriptors();
-      labeledFaceDescriptors = dbLabeledFaceDescriptors.map( record => {
-        return new faceapi.LabeledFaceDescriptors(record.userId, [record.front, record.left, record.right])
+      const labeledFaceDescriptors = dbLabeledFaceDescriptors.map( record => {
+        let front = new Float32Array(128);
+        let left = new Float32Array(128);
+        let right = new Float32Array(128);
+        // console.log(record);
+        record.front.forEach((elm, i) => {
+          front[i] = elm;
+        });
+        record.left.forEach((elm, i) => {
+          left[i] = elm;
+        });
+        record.right.forEach((elm, i) => {
+          right[i] = elm;
+        });
+        record.userId = record.userId.toString();
+        // console.log(typeof record.userId)
+        return new faceapi.LabeledFaceDescriptors(record.userId.toString(), [front, left, right])
       });
-      SERVER_CACHE_MEMORY.set(process.env.DESCRIPTOR_KEY, labeledFaceDescriptors); // maybe adds some time for how long it stays in cache
+      SERVER_CACHE_MEMORY.set(process.env.DESCRIPTOR_KEY, labeledFaceDescriptors); // maybe adds some time for how long it stays in cache, Expiry Date
     }
-
     let faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
-
-    // cache the dbLabeledFaceDescriptors Of not changed, of changed fetch'em from the database//
-    // OR //
-    // we can just, cache the  labeledFaceDescriptors and save time mapping over all the records
-
-
     whatYouRecievFromTheFrontEnd.forEach(fd => {
       let obj = {};
       const bestMatch = faceMatcher.findBestMatch(fd.descriptor);
@@ -59,9 +68,6 @@ module.exports = whatYouRecievFromTheFrontEnd => {
       obj.userId = bestMatch.toString();
       toBeSavedtoDB.push(obj)
     });
-
-    //return insertMany(toBeSavedtoDB)
-
     return toBeSavedtoDB;
   }
 };

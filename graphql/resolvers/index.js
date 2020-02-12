@@ -66,7 +66,7 @@ const resolvers = {
                 if (!user) {
                     return new Error("Error with inserting the user")
                 }
-                Descriptor.insertOneDescriptor({
+                await Descriptor.insertOneDescriptor({
                     userId: user._id,
                     front: data.descriptors[0],
                     left: data.descriptors[1],
