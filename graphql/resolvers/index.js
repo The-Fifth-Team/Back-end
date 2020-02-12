@@ -7,8 +7,10 @@ const Descriptor = require('../../Models/Descriptors.js');
 const recognizerService = require('../../services/recognizer/recognizer.js');
 const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 const json2csv = require('../../helper_function/json2csv');
+
 //This is the Configuration for the the Cloudniray services
 //to be able to save images online
+
 require('../../SERVER_CACHE_MEMORY');
 
 const emotions = [];
@@ -108,13 +110,18 @@ const resolvers = {
          * @since 1.0.0
          * @version 1.0.0
          */
-        async userFaceIdentifier(parent, {data}){
-            const toBeSaved = await recognizerService(data);
-            const result = await Emotion.insertManyEmotion(toBeSaved);
-            if(!result){
-                return new Error("error with fetching the Emotions")
-            }
-            return data[0].expressions;
+        userFaceIdentifier(parent, { data }, { pubsub }){
+          const toBeSaved = recognizerService(data);
+          Emotion.insertManyEmotion(toBeSaved)
+            .then(emotionData => {
+              emotions.push(emotionData);
+              pubsub.publish(EMOTION_CHANNEL, {
+                faceDetected: emotionData
+              })
+            })
+            .catch(err => {
+              console.error(err);
+            })
         },
 
         /**
@@ -138,6 +145,9 @@ const resolvers = {
         }
     },
     Query: {
+        emotions () {
+          return emotions
+        },
         /**
          * @function getAllUsers used to pull all the users from the database
          * @return {Promise<object|Error>} all the users that exists in the database, return Error if problem occurred

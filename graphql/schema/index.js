@@ -13,7 +13,8 @@ const typeDefs = gql`
     signInAdmin(email: String!, password: String!): Token
   }
 
-  type Query{
+  type Query {
+    emotions: [Emotion]
     getAllUsers: [User]!
     getPeriodEmotions(startDate: String!, endDate: String!): RiverChartReturnType
     faceLogIn(data: [Float!]!): Token

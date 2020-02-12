@@ -30,9 +30,9 @@ module.exports = whatYouRecievFromTheFrontEnd => {
   async function start() {
     let toBeSavedtoDB = [];
     let labeledFaceDescriptors;
-    if(SERVER_CACHE_MEMORY.has(process.env.DESCRIPTOR_KEY)){
+    if (SERVER_CACHE_MEMORY.has(process.env.DESCRIPTOR_KEY)) {
       labeledFaceDescriptors = SERVER_CACHE_MEMORY.get(process.env.DESCRIPTOR_KEY);
-    }else{
+    } else {
       const dbLabeledFaceDescriptors = await findAllDescriptors();
       const labeledFaceDescriptors = dbLabeledFaceDescriptors.map( record => {
         let front = new Float32Array(128);
