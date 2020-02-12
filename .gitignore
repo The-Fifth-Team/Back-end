@@ -1,2 +1,3 @@
 node_modules
-confing/config.js
+config.env
+TEST.js
