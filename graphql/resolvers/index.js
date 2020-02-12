@@ -11,6 +11,9 @@ const json2csv = require('../../helper_function/json2csv');
 //to be able to save images online
 require('../../SERVER_CACHE_MEMORY');
 
+const emotions = [];
+const EMOTION_CHANNEL = 'EMOTION_CHANNEL';
+
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.PHOTO_CLOUD_API_KEY,
@@ -34,6 +37,11 @@ const _verifyToken = token => jwt.verify(token, process.env.JWT_SECRET);
 
 //Resolvers for the system which contain the Mutations and Queries for the graphql API
 const resolvers = {
+    Subscription: {
+      faceDetected: {
+        subscribe: (_, { data }, { pubsub }) => pubsub.asyncIterator(EMOTION_CHANNEL, data)
+      }
+    },
     Mutation: {
         /**
          * @async
@@ -44,43 +52,43 @@ const resolvers = {
          * @since 1.0.0
          */
         async uploadUser(parent, { data },) {
-            const { createReadStream } = await data.photo;
-            try {
-                const result = await new Promise((resolve, reject) => {
-                    createReadStream().pipe(
-                        cloudinary.uploader.upload_stream((error, result) => {
-                            if (error) {
-                                reject(error)
-                            }
-                            resolve(result)
-                        })
-                    )
-                });
-                let user = await User.insertUser({
-                    firstName: data.firstName,
-                    lastName: data.lastName,
-                    age: data.age,
-                    gender: data.gender,
-                    photoUrl: result.secure_url
-                });
-                if (!user) {
-                    return new Error("Error with inserting the user")
+          const { createReadStream } = await data.photo;
+          const result = await new Promise((resolve, reject) => {
+            createReadStream().pipe(
+              cloudinary.uploader.upload_stream((error, result) => {
+                if (error) {
+                  reject(error)
                 }
-                await Descriptor.insertOneDescriptor({
-                    userId: user._id,
-                    front: data.descriptors[0],
-                    left: data.descriptors[1],
-                    right: data.descriptors[2]
-                });
-                // deletes the key for descriptors, because the cache now does not contain the most updated version of the descriptors
-                SERVER_CACHE_MEMORY.del(process.env.DESCRIPTOR_KEY);
-                //this should be added to any function that well manipulate the descriptors, collations EXCEPT for querying and reading functions
-                console.log("Inserted Successful");
-                return user;
-            } catch (err) {
-                console.error(err);
-                return err;
-            }
+                resolve(result)
+              })
+            )
+          });
+          User.insertUser({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            age: data.age,
+            gender: data.gender,
+            photoUrl: result.secure_url
+          })
+          .then(userData => {
+            return Descriptor.insertOneDescriptor({
+              userId: userData._id,
+              front: data.descriptors[0],
+              left: data.descriptors[1],
+              right: data.descriptors[2]
+            });
+          })
+          .then(result => {
+            console.log("User Inserted");
+            console.log("Descriptor Inserted ");
+            console.log(result);
+          })
+          .catch(err => {
+            console.error(err);
+          })
+          // deletes the key for descriptors, because the cache now does not contain the most updated version of the descriptors
+          SERVER_CACHE_MEMORY.del(process.env.DESCRIPTOR_KEY);
+          //this should be added to any function that well manipulate the descriptors, collations EXCEPT for querying and reading functions
         },
         /**
          * @function addAdmin used to add an admin to the database
