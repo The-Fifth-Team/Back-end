@@ -9,7 +9,7 @@ const typeDefs = gql`
   type Mutation {
     uploadUser(data: UserInput!): User
     addAdmin(data: AdminInput!): Admin!
-    userFaceIdentifier(data: [ObservationInput]): Emotion
+    userFaceIdentifier(data: [ObservationInput]!): Emotion
     signInAdmin(email: String!, password: String!): Token
   }
 
@@ -56,17 +56,6 @@ const typeDefs = gql`
   }
      
   input EmotionInput {
-    neutral: Float
-    happy: Float
-    sad: Float
-    angry: Float
-    fearful: Float
-    disgusted: Float
-    surprised: Float
-  }
-
-  type Emotion {
-    _id: ID
     neutral: Float!
     happy: Float!
     sad: Float!
@@ -74,6 +63,17 @@ const typeDefs = gql`
     fearful: Float!
     disgusted: Float!
     surprised: Float!
+  }
+
+  type Emotion {
+    _id: ID
+    neutral: Float
+    happy: Float
+    sad: Float
+    angry: Float
+    fearful: Float
+    disgusted: Float
+    surprised: Float
     userId: ID
     createdAt: String
   }
@@ -90,11 +90,12 @@ const typeDefs = gql`
   type RiverChartReturnType {
     averages: [[Float!]!]!
     status: [Status!]!
+    timeStamps: [String]!
   }
     
   input ObservationInput {
-    descriptor: [Float]
-    expressions: EmotionInput
+    descriptor: [Float]!
+    expressions: EmotionInput!
   }
   
 `;
