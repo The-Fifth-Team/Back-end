@@ -9,7 +9,7 @@ const typeDefs = gql`
   type Mutation {
     uploadUser(data: UserInput!): User
     addAdmin(data: AdminInput!): Admin!
-    userFaceIdentifier(data: [ObservationInput]): Emotion
+    userFaceIdentifier(data: [ObservationInput]!): Emotion
     signInAdmin(email: String!, password: String!): Token
   }
 
@@ -17,6 +17,8 @@ const typeDefs = gql`
     getAllUsers: [User]!
     getPeriodEmotions(startDate: String!, endDate: String!): RiverChartReturnType
     faceLogIn(data: [Float!]!): Token
+    getEmotionAveragesForLast24Hours: Emotion!
+    getEmotionsCsvReport: String!
   }
 
 
@@ -35,14 +37,13 @@ const typeDefs = gql`
   }
 
   type User {
-    _id:ID!
-    firstName: String!
-    lastName: String!
-    age: Int!
-    gender: String!
-    descriptors: [[Float]]!
-    photo: Upload!
-    createdAt: String!
+    _id:ID
+    firstName: String
+    lastName: String
+    age: Int
+    gender: String
+    photoUrl: String
+    createdAt: String
   }
 
   input UserInput {
@@ -53,18 +54,8 @@ const typeDefs = gql`
     descriptors: [[Float]]!
     photo: Upload!
   }
-
+     
   input EmotionInput {
-    neutral: Float
-    happy: Float
-    sad: Float
-    angry: Float
-    fearful: Float
-    disgusted: Float
-    surprised: Float
-  }
-
-  type Emotion {
     neutral: Float!
     happy: Float!
     sad: Float!
@@ -72,8 +63,19 @@ const typeDefs = gql`
     fearful: Float!
     disgusted: Float!
     surprised: Float!
-    userId: ID!
-    createdAt: String!
+  }
+
+  type Emotion {
+    _id: ID
+    neutral: Float
+    happy: Float
+    sad: Float
+    angry: Float
+    fearful: Float
+    disgusted: Float
+    surprised: Float
+    userId: ID
+    createdAt: String
   }
 
   type Status {
@@ -88,11 +90,12 @@ const typeDefs = gql`
   type RiverChartReturnType {
     averages: [[Float!]!]!
     status: [Status!]!
+    timeStamps: [String]!
   }
     
   input ObservationInput {
-    descriptor: [Float]
-    expressions: EmotionInput
+    descriptor: [Float]!
+    expressions: EmotionInput!
   }
   
 `;

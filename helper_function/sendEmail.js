@@ -3,10 +3,10 @@ const nodemailer = require('nodemailer');
 /**
  * @async
  * @function sendMail used to send an email to a specific user
- * @param {string} email  the email of the receiver
- * @param {string} subject  the subject of the email to be sent
- * @param {string} text if you dont want to send HTML template you can just send a plain text
- * @param {string} template  the template of the message, needs to be in HTML format
+ * @param {string} email -  the email of the receiver
+ * @param {string} subject -  the subject of the email to be sent
+ * @param {string} text - if you dont want to send HTML template you can just send a plain text
+ * @param {string} template -  the template of the message, needs to be in HTML format
  * */
 exports.sendMail = async(email, subject, text,template = "") => {
     try {
@@ -18,10 +18,8 @@ exports.sendMail = async(email, subject, text,template = "") => {
             port: 25,
             secure: false,
             auth: {
-
-                user: "208388a08a4635",
-                pass: "a53ff223db9006"
-
+                user: process.env.EMAIL_USERNAME,
+                pass: process.env.EMAIL_PASSWORD
             },
             tls: {
                 rejectUnauthorized: false
