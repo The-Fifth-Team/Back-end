@@ -6,8 +6,10 @@ const Emotion = require('../../Models/Emotion.js');
 const Descriptor = require('../../Models/Descriptors.js');
 const recognizerService = require('../../services/recognizer/recognizer.js');
 const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
+const json2csv = require('../../helper_function/json2csv');
 //This is the Configuration for the the Cloudniray services
 //to be able to save images online
+require('../../SERVER_CACHE_MEMORY');
 
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
@@ -39,7 +41,6 @@ const resolvers = {
          * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data  the object that contains the data needed for this mutation
          * @return {Promise<object|Error>} user  the User that get saved to the database, return Error if problem occurred
-         * @author Abobker Elaghel
          * @since 1.0.0
          */
         async uploadUser(parent, { data },) {
@@ -71,6 +72,9 @@ const resolvers = {
                     left: data.descriptors[1],
                     right: data.descriptors[2]
                 });
+                // deletes the key for descriptors, because the cache now does not contain the most updated version of the descriptors
+                SERVER_CACHE_MEMORY.del(process.env.DESCRIPTOR_KEY);
+                //this should be added to any function that well manipulate the descriptors, collations EXCEPT for querying and reading functions
                 console.log("Inserted Successful");
                 return user;
             } catch (err) {
@@ -83,7 +87,6 @@ const resolvers = {
          * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data  the object that contains the data needed for this mutation, admin object
          * @return {Promise<object|Error>} the admin that get saved to the database, return Error if problem occurred
-         * @author Abobker Elaghel
          * @since 1.0.0
          */
         addAdmin(parent, { data }) {
@@ -130,7 +133,6 @@ const resolvers = {
         /**
          * @function getAllUsers used to pull all the users from the database
          * @return {Promise<object|Error>} all the users that exists in the database, return Error if problem occurred
-         * @author Abobker Elaghel
          * @since 1.0.0
          */
         getAllUsers() {
@@ -139,7 +141,6 @@ const resolvers = {
         /**
          * @function getAllAdmins pulls all the admin from the database
          * @return {Promise<object|Error>} all the admins that exists in the database, return Error if problem occurred
-         * @author Abobker Elaghel
          * @since 1.0.0
          * @deprecated
          */
@@ -158,7 +159,6 @@ const resolvers = {
          * @param {string} endDate - the end date in stringified format
          * @param token - the admin token sent from the front-end
          * @return {Promise<object|Error>} object contains the array of arrays of the averages, and the Noise Emotions
-         * @author Abobker Elaghel
          * @since 1.0.0
          * @version 1.3.1
          */
@@ -305,7 +305,6 @@ const resolvers = {
          * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data the array of face descriptors for the user
          * @return {object} the jwt sign-in-token to be saved in the frontend
-         * @author Abobker Elaghel
          * @version 1.0.0
          * @since 1.0.0
          */
@@ -322,6 +321,45 @@ const resolvers = {
                 }
                 //if everything match, token well be sent to the front-end
             return { token: _signToken(user._id) };
+        },
+        /**
+         * @async
+         * @function getEmotionAveragesForLast24Hours - return the averages of all the emotions that happened in the last 24 hours
+         * @return {object} - the object that contains the averages in the last hours
+         */
+        async getEmotionAveragesForLast24Hours(){
+            let result = await Emotion.aggregate([{$match:{createdAt:{$gte:new Date(Date.now()-(24*60*60*1000))}}},{$group:{_id:"",neutral:{$avg:"$neutral"},happy:{$avg:"$happy"},sad:{$avg:"$sad"},
+                    angry:{$avg:"$angry"},fearful:{$avg:"$fearful"},disgusted:{$avg:"$disgusted"},surprised:{$avg:"$surprised"}}}]);
+            delete result[0]["_id"];
+            return result[0];
+        },
+        /**
+         * @async
+         * @function getEmotionsCsvReport - used to return all the emotions in the database as a CSV report String
+         * @return {Promise<string>} - string contains a CSV report
+         */
+        async getEmotionsCsvReport(){
+            let emotions = await Emotion.findEmotions({}).populate("userId");
+            // Because of the others Hidden Attributes // Can Be seen by console.dir(nameOFYouVariable)
+            // i need to extract the attributes i need to run a loop
+            let result = [];
+            for (let i = 0; i < emotions.length ; i++) {
+                result.push(
+                    {
+                        userId: emotions[i].userId._id,
+                        firstName: emotions[i].userId.firstName,
+                        lastName: emotions[i].userId.lastName,
+                        gender: emotions[i].userId.gender,
+                        neutral: emotions[i].neutral,
+                        happy: emotions[i].happy,
+                        sad: emotions[i].sad,
+                        angry: emotions[i].angry,
+                        fearful: emotions[i].fearful,
+                        disgusted: emotions[i].disgusted,
+                        surprised: emotions[i].surprised
+                    })
+            }
+            return json2csv.json2CsvASync(result);
         }
     }
 };

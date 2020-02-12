@@ -5,7 +5,6 @@ const fs = require('fs');
  * @function json2CsvSync takes a JSON Object, and convert it to CSV Format
  * @param {object} jsonDoc the json object, to be converted to Csv Format
  * @return {string} the converted csv file as a String
- * @author Abobker Elaghel
  * */
 exports.json2CsvSync = jsonDoc => {
     return json2csv.parse(jsonDoc);
@@ -15,7 +14,6 @@ exports.json2CsvSync = jsonDoc => {
  * @function json2CsvASync takes a JSON Object, and convert it to CSV Format Asynchronously and returns a promise
  * @param jsonDoc {object} the json object, to be converted to Csv Format
  * @return {Promise<string>} the converted csv file as a String
- * @author Abobker Elaghel
  * */
 exports.json2CsvASync = jsonDoc => {
     return json2csv.parseAsync(jsonDoc);
@@ -28,7 +26,6 @@ exports.json2CsvASync = jsonDoc => {
  * @param filePath {string} the path And the file name to write the stream into
  * @note the path to the file should be Absolute path
  * @param jsonObject {object} the object to be converted to csv format
- * @author Abobker Elaghel
  * */
 exports.writeCsvFile = async(filePath, jsonObject) => {
     try {
@@ -46,7 +43,6 @@ exports.writeCsvFile = async(filePath, jsonObject) => {
  * @function _checkPath used to add the .csv extinction at the end and remove any other extinction if one exists
  * @param path {string} the path to be checked
  * @return {string} path after adding .csv to it
- * @author Abobker Elaghel
  * @private Not to be used outside the scope of this file
  * */
 const _checkPath = path => {

@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 const { ApolloServer } = require('apollo-server-express');
 const typeDefs = require('./graphql/schema');
 const resolvers = require('./graphql/resolvers');
-
 const PORT = process.env.PORT || 4000;
 
 const app = express();

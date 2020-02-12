@@ -8,7 +8,6 @@ module.exports = {
          * @param {object} parent pointer which points to the parent function, in the query Or mutation order, which called this function (IF EXISTS)
          * @param {string} email of the user that forgets his/her password
          * @return {Promise<string|Error>} return a message donating the success of sending the email OR Error of happened
-         * @author Abobker_Elaghel
          * @since 1.0.0
          * @version 1.0.0
          */
@@ -28,7 +27,6 @@ module.exports = {
          * @param {object} parent pointer which points to the parent function, in the query Or mutation order, which called this function (IF EXISTS)
          * @param {string} token the token sent back from the user, when he/she clicked the url provided
          * @return {string|Error} hashedToken return the hashed Token to be checked in the next step of the process
-         * @author Abobker_Elaghel
          * @since 1.0.0
          * @version 1.0.0
          */
@@ -54,7 +52,6 @@ module.exports = {
          * @param {string} token the hashed token that well be received from the previous step
          * @param {string} password the new Password that well be saved for this specific admin
          * @return token {string|Error} of no error happens, returns a new sign in Token
-         * @author Abobker_Elaghel
          * @since 1.0.0
          * @version 1.0.0
          */

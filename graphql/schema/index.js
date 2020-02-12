@@ -17,6 +17,8 @@ const typeDefs = gql`
     getAllUsers: [User]!
     getPeriodEmotions(startDate: String!, endDate: String!): RiverChartReturnType
     faceLogIn(data: [Float!]!): Token
+    getEmotionAveragesForLast24Hours: Emotion!
+    getEmotionsCsvReport: String!
   }
 
 
@@ -35,14 +37,13 @@ const typeDefs = gql`
   }
 
   type User {
-    _id:ID!
-    firstName: String!
-    lastName: String!
-    age: Int!
-    gender: String!
-    descriptors: [[Float]]!
-    photo: Upload!
-    createdAt: String!
+    _id:ID
+    firstName: String
+    lastName: String
+    age: Int
+    gender: String
+    photoUrl: String
+    createdAt: String
   }
 
   input UserInput {
@@ -53,7 +54,7 @@ const typeDefs = gql`
     descriptors: [[Float]]!
     photo: Upload!
   }
-
+     
   input EmotionInput {
     neutral: Float
     happy: Float
@@ -65,6 +66,7 @@ const typeDefs = gql`
   }
 
   type Emotion {
+    _id: ID
     neutral: Float!
     happy: Float!
     sad: Float!
@@ -72,8 +74,8 @@ const typeDefs = gql`
     fearful: Float!
     disgusted: Float!
     surprised: Float!
-    userId: ID!
-    createdAt: String!
+    userId: ID
+    createdAt: String
   }
 
   type Status {
