@@ -44,7 +44,7 @@ const resolvers = {
          * @since 1.0.0
          */
         async uploadUser(parent, { data },) {
-            const { filename, createReadStream } = await data.photo;
+            const { createReadStream } = await data.photo;
             try {
                 const result = await new Promise((resolve, reject) => {
                     createReadStream().pipe(
@@ -56,7 +56,7 @@ const resolvers = {
                         })
                     )
                 });
-                let user = await insertUser({
+                let user = await User.insertUser({
                     firstName: data.firstName,
                     lastName: data.lastName,
                     age: data.age,
@@ -101,13 +101,12 @@ const resolvers = {
          * @version 1.0.0
          */
         async userFaceIdentifier(parent, {data}){
-
-             const toBeSaved = await recognizerService(data);
-             const result = await Emotion.insertManyEmotion(toBeSaved);
-             if(!result){
-                 return new Error("error with fetching the Emotions")
-             }
-             //may want to return the emotions later
+            const toBeSaved = await recognizerService(data);
+            const result = await Emotion.insertManyEmotion(toBeSaved);
+            if(!result){
+                return new Error("error with fetching the Emotions")
+            }
+            return data[0].expressions;
         },
 
         /**
@@ -170,6 +169,7 @@ const resolvers = {
             // }
             let startDateInt = parseInt(startDate); // INT type
             let endDateInt = parseInt(endDate); // INT type
+            let timeStamps = [];
             startDate = new Date(startDateInt); // Date type
             endDate = new Date(endDateInt); // Date type
 
@@ -178,8 +178,55 @@ const resolvers = {
             let assertCounter = 0;
             const MAX_ITERATIONS = 10000;
 
-            let neutralStatus, happyStatus, sadStatus, angryStatus, fearfulStatus, disgustedStatus, surprisedStatus;
-            neutralStatus = happyStatus = sadStatus = angryStatus = fearfulStatus = disgustedStatus = surprisedStatus = {
+            let neutralStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let happyStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let sadStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let angryStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let fearfulStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let disgustedStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let surprisedStatus = {
                 maxValue: 0,
                 minValue: 1,
                 startAtMax: "",
@@ -191,9 +238,6 @@ const resolvers = {
             let startDateIntNext,startPeriod,endPeriod;
             while ((startDateInt < endDateInt) && (assertCounter < MAX_ITERATIONS)) {
                 assertCounter++;
-                // startDateInt START
-                // startDateIntNext END
-
                 startDateIntNext = (startDateInt + (15 * 60 * 1000));
                 startPeriod = new Date(startDateInt);
                 endPeriod = new Date(startDateIntNext);
@@ -277,27 +321,32 @@ const resolvers = {
                         surprisedStatus.endAtMin = startDateIntNext.toString();
                     }
                 }
-                emotionsTotal.push(arrayOfEmotions);
+                if(arrayOfEmotions.length !== 0){
+                    emotionsTotal.push(arrayOfEmotions);
+                    timeStamps.push(startDateIntNext.toString());
+                }
+
                 startDateInt = startDateIntNext;
             }
             let finalResult = [];
             let neutralSum, happySum, sadSum, angrySum, fearfulSum, disgustedSum, surprisedSum;
             neutralSum = happySum = sadSum = angrySum = fearfulSum = disgustedSum = surprisedSum = 0;
             for (let i = 0; i < emotionsTotal.length; i++) {
-                for (let j = 0; j < emotionsTotal[i]; j++) {
-                    neutralSum = neutralSum += emotionsTotal[i][j]["neutral"];
-                    happySum = happySum += emotionsTotal[i][j]["happy"];
-                    sadSum = sadSum += emotionsTotal[i][j]["sad"];
-                    angrySum = angrySum += emotionsTotal[i][j]["angry"];
-                    fearfulSum = fearfulSum += emotionsTotal[i][j]["fearful"];
-                    disgustedSum = disgustedSum += emotionsTotal[i][j]["disgusted"];
-                    surprisedSum = surprisedSum += emotionsTotal[i][j]["surprised"];
+                for (let j = 0; j < emotionsTotal[i].length; j++) {
+                    neutralSum += emotionsTotal[i][j]["neutral"];
+                    happySum += emotionsTotal[i][j]["happy"];
+                    sadSum += emotionsTotal[i][j]["sad"];
+                    angrySum += emotionsTotal[i][j]["angry"];
+                    fearfulSum += emotionsTotal[i][j]["fearful"];
+                    disgustedSum += emotionsTotal[i][j]["disgusted"];
+                    surprisedSum += emotionsTotal[i][j]["surprised"];
                 }
-                finalResult.push([(neutralSum / emotionsTotal[i]), (happySum / emotionsTotal[i]), (sadSum / emotionsTotal[i]), (angrySum / emotionsTotal[i]), (fearfulSum / emotionsTotal[i]), (disgustedSum / emotionsTotal[i]), (surprisedSum / emotionsTotal[i])])
+                finalResult.push([ (neutralSum / emotionsTotal[i].length) , (happySum / emotionsTotal[i].length), (sadSum / emotionsTotal[i].length), (angrySum / emotionsTotal[i].length), (fearfulSum / emotionsTotal[i].length), (disgustedSum / emotionsTotal[i].length), (surprisedSum / emotionsTotal[i].length)])
             }
             return {
                 averages: finalResult,
-                status: [neutralStatus, happyStatus, sadStatus, angryStatus, fearfulStatus, disgustedStatus, surprisedStatus]
+                status: [neutralStatus, happyStatus, sadStatus, angryStatus, fearfulStatus, disgustedStatus, surprisedStatus],
+                timeStamps
             }
         },
         /**
@@ -365,3 +414,4 @@ const resolvers = {
     }
 };
 module.exports = resolvers;
+
