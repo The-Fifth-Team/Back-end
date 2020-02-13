@@ -75,7 +75,7 @@ const resolvers = {
                     right: data.descriptors[2]
                 });
                 // deletes the key for descriptors, because the cache now does not contain the most updated version of the descriptors
-                SERVER_CACHE_MEMORY.del(process.env.DESCRIPTOR_KEY);
+                SERVER_CACHE_MEMORY[process.env.DESCRIPTOR_KEY] = undefined;
                 //this should be added to any function that well manipulate the descriptors, collations EXCEPT for querying and reading functions
                 console.log("Inserted Successful");
                 return user;
