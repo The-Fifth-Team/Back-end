@@ -114,9 +114,22 @@ const resolvers = {
          */
         async userFaceIdentifier(parent, { data }, { pubsub }) {
             const toBeSaved = await recognizerService(data);
-            Emotion.insertManyEmotion(toBeSaved)
+            // console.log(toBeSaved)
+            // toBeSaved = toBeSaved.forEach(elm => {
+            //     elm.userId.split(" ")[0].toString();
+            // })
+            let extractedObj = toBeSaved.map(elm => {
+                if (elm.userId.split(" ")[0].toString() !== 'unknown') {
+                    let temp = elm;
+                    temp.userId = temp.userId.split(" ")[0].toString();
+                    return Object.assign(elm, temp)
+                }
+            })
+
+            Emotion.insertManyEmotion(extractedObj)
                 .then(emotionData => {
                     emotions.push(emotionData);
+                    console.log(emotionData)
                     pubsub.publish(EMOTION_CHANNEL, {
                         faceDetected: emotionData
                     })
