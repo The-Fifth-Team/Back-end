@@ -11,6 +11,7 @@ const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 const json2csv = require('../../helper_function/json2csv');
 const sendEmail = require('../../helper_function/sendEmail');
 const crypto = require('crypto');
+const zees = require('../../services/getProbabilityService/getProbabilityService.js');
 //This is the Configuration for the the Cloudniray services
 //to be able to save images online
 
@@ -512,10 +513,10 @@ const resolvers = {
         },
         async getAnalyticEmotion(){
             const date24HFromNow = new Date(Date.now() - (24 * 60 * 60 * 1000));
-            const historicalEmotions = await Emotion.findEmotions({"createdAt" : {"$lt": date24HFromNow}});
-            const emotionsBefore24 = await Emotion.findEmotions({"createdAt" : {"$gte": date24HFromNow}});
+            const historicalData = await Emotion.findEmotions({"createdAt" : {"$lt": date24HFromNow}});
+            const recentData = await Emotion.findEmotions({"createdAt" : {"$gte": date24HFromNow}});
 
-
+            return zees(recentData,historicalData);
         }
     }
 };
