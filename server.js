@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const { ApolloServer } = require('apollo-server-express');
 const typeDefs = require('./graphql/schema');
 const resolvers = require('./graphql/resolvers');
-const PORT = process.env.PORT || 4000;
+// const PORT = process.env.PORT || 4000;
 const app = express();
 const cors = require('cors');
 
@@ -53,6 +53,6 @@ mongoose.connect("mongodb+srv://ali-jalal:thefifthteam@cluster0-p3vu6.mongodb.ne
     }
 });
 
-httpServer.listen({ port: PORT }, () => {
+httpServer.listen({ port: 4000 }, () => {
     console.log(`Server ready at http://localhost:4000/graphql`);
 });

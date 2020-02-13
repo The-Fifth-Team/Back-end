@@ -15,15 +15,20 @@ faceapi.env.monkeyPatch({
   ImageData
 });
 
-module.exports = (whatYouRecievFromTheFrontEnd) => {
-  Promise.all([
+module.exports = async whatYouRecievFromTheFrontEnd => {
+  return await Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromDisk('models'),
     faceapi.nets.faceLandmark68Net.loadFromDisk('models'),
     faceapi.nets.ssdMobilenetv1.loadFromDisk('models'),
     faceapi.nets.faceExpressionNet.loadFromDisk('models')
-  ]).then(start);
+  ])
+    .then(async () => await start())
+    .catch(err => {
+      console.error(err);
+      return;
+    })
 
-  async function start() {
+  async function start () {
     let toBeSavedtoDB = [];
     const dbLabeledFaceDescriptors = await findAllDescriptors();
 
@@ -34,9 +39,9 @@ module.exports = (whatYouRecievFromTheFrontEnd) => {
     let faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
     const bestMatch = faceMatcher.findBestMatch(whatYouRecievFromTheFrontEnd);
     if (bestMatch.toString().toLowerCase() !== "unknown"){
-      return bestMatch.toString(); //_id
-     }
-    return null;
+      return bestMatch.toString(); // _id
+    }
+      return null;
     }
 };
 

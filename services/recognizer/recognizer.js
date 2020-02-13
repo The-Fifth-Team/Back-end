@@ -15,17 +15,17 @@ faceapi.env.monkeyPatch({
   ImageData
 });
 
-module.exports = whatYouRecievFromTheFrontEnd => {
-  Promise.all([
+module.exports = async whatYouRecievFromTheFrontEnd => {
+  return await Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromDisk('models1'),
     faceapi.nets.faceLandmark68Net.loadFromDisk('models1'),
     faceapi.nets.ssdMobilenetv1.loadFromDisk('models1'),
     faceapi.nets.faceExpressionNet.loadFromDisk('models1')
   ])
-      .then(start())
-      .catch(err => {
-        console.log(err)
-      });
+    .then(async () => await start())
+    .catch(err => {
+      console.log(err)
+    });
 
   async function start() {
     let toBeSavedtoDB = [];
