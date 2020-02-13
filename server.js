@@ -18,18 +18,19 @@ const pubsub = new PubSub();
 
 dotenv.config({ path: './config.env' });
 const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: ({ req, res }) => ({ req, res, pubsub }),
-  subscriptions: {
-    onConnect: (connectionParams, webSocket, context) => {
-      // Client connection
+    typeDefs,
+    resolvers,
+    context: ({ req, res }) => ({ req, res, pubsub }),
+
+    subscriptions: {
+        onConnect: (connectionParams, webSocket, context) => {
+            // Client connection
+        },
+        onDisconnect: (webSocket, context) => {
+            // Client disconnects
+        }
     },
-    onDisconnect: (webSocket, context) => {
-      // Client disconnects
-    }
-  },
-  introspection: true,
+    introspection: true,
 });
 
 server.applyMiddleware({ app });
@@ -39,7 +40,7 @@ server.installSubscriptionHandlers(httpServer);
 
 mongoose.Promise = global.Promise;
 // Mongodb connection//
-mongoose.connect("mongodb+srv://ali-jalal:thefifthteam@cluster0-p3vu6.mongodb.net/test?retryWrites=true&w=majority", {
+mongoose.connect(process.env.DATABASE_URL, {
     useCreateIndex: true,
     useNewUrlParser: true,
     useFindAndModify: false,

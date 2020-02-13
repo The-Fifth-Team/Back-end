@@ -1,47 +1,64 @@
-// const tensorFlow = require('@tensorflow/tfjs-node');
+require('@tensorflow/tfjs-node');
 const canvas = require('canvas');
 const faceapi = require('face-api.js');
-//const insertMany = require('../../Models/Emotion').insertMany;
-//const findAllDescriptors = require('../../Models/Descriptors').findAllDescriptors
+const { findAllDescriptors } = require("../../Models/Descriptors");
+require('../../SERVER_CACHE_MEMORY');
 
 const {
-  Canvas,
-  Image,
-  ImageData
+    Canvas,
+    Image,
+    ImageData
 } = canvas;
 faceapi.env.monkeyPatch({
-  Canvas,
-  Image,
-  ImageData
+    Canvas,
+    Image,
+    ImageData
 });
 
-module.exports = async whatYouRecievFromTheFrontEnd => {
-  return await Promise.all([
-    faceapi.nets.faceRecognitionNet.loadFromDisk('models'),
-    faceapi.nets.faceLandmark68Net.loadFromDisk('models'),
-    faceapi.nets.ssdMobilenetv1.loadFromDisk('models'),
-    faceapi.nets.faceExpressionNet.loadFromDisk('models')
-  ])
-    .then(async () => await start())
-    .catch(err => {
-      console.error(err);
-      return;
-    })
+module.exports = async descriptorArray => {
+    return await Promise.all([
+            faceapi.nets.faceRecognitionNet,
+            faceapi.nets.faceLandmark68Net,
+            faceapi.nets.ssdMobilenetv1,
+            faceapi.nets.faceExpressionNet
+        ])
+        .then(async() => await start())
+        .catch(err => {
+            console.log(err)
+        });
 
-  async function start () {
-    let toBeSavedtoDB = [];
-    const dbLabeledFaceDescriptors = await findAllDescriptors();
+    async function start() {
+        let labeledFaceDescriptors;
+        if (SERVER_CACHE_MEMORY[process.env.DESCRIPTOR_KEY]) {
+            labeledFaceDescriptors = SERVER_CACHE_MEMORY[process.env.DESCRIPTOR_KEY];
+        } else {
+            const dbLabeledFaceDescriptors = await findAllDescriptors();
+            labeledFaceDescriptors = dbLabeledFaceDescriptors.map(record => {
+                let front = new Float32Array(128);
+                let left = new Float32Array(128);
+                let right = new Float32Array(128);
+                // console.log(record);
+                record.front.forEach((elm, i) => {
+                    front[i] = elm;
+                });
+                record.left.forEach((elm, i) => {
+                    left[i] = elm;
+                });
+                record.right.forEach((elm, i) => {
+                    right[i] = elm;
+                });
+                record.userId = record.userId.toString();
+                // console.log(typeof record.userId)
+                return new faceapi.LabeledFaceDescriptors(record.userId.toString(), [front, left, right])
+            });
+            SERVER_CACHE_MEMORY[process.env.DESCRIPTOR_KEY] = labeledFaceDescriptors;
+        }
 
-   const labeledFaceDescriptors = dbLabeledFaceDescriptors.map((record) => {
-      return new faceapi.LabeledFaceDescriptors(record.userId, [record.front, record.left, record.right])
-    });
-
-    let faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
-    const bestMatch = faceMatcher.findBestMatch(whatYouRecievFromTheFrontEnd);
-    if (bestMatch.toString().toLowerCase() !== "unknown"){
-      return bestMatch.toString(); // _id
-    }
-      return null;
+        let faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
+        const bestMatch = faceMatcher.findBestMatch(descriptorArray);
+        if (bestMatch.toString().toLowerCase() !== "unknown") {
+            return bestMatch.toString(); //_id
+        }
+        return null;
     }
 };
-
