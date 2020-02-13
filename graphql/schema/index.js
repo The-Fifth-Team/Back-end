@@ -9,7 +9,7 @@ const typeDefs = gql`
   type Mutation {
     uploadUser(data: UserInput!): Token
     addAdmin(data: AdminInput!): Admin!
-    userFaceIdentifier(data: [ObservationInput]!): Emotion
+    userFaceIdentifier(data: [ObservationInput]): Emotion
     signInAdmin(email: String!, password: String!): Token
   }
 
@@ -23,7 +23,7 @@ const typeDefs = gql`
   }
 
   type Subscription {
-    faceDetected: Emotion!
+    faceDetected: Emotion
   }
 
   input AdminInput {

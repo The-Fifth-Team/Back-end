@@ -20,8 +20,7 @@ dotenv.config({ path: './config.env' });
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req, res }) => ({ req, res, pubsub }) ,
-
+  context: ({ req, res }) => ({ req, res, pubsub }),
   subscriptions: {
     onConnect: (connectionParams, webSocket, context) => {
       // Client connection

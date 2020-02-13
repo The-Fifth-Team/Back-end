@@ -112,9 +112,13 @@ const resolvers = {
        * @since 1.0.0
        * @version 1.0.0
        */
-      userFaceIdentifier(parent, { data }, { pubsub }){
-        const toBeSaved = recognizerService(data);
-        Emotion.insertManyEmotion(toBeSaved)
+     async userFaceIdentifier(parent, { data }, { pubsub }){
+        // console.log(data)
+        const toBeSaved = await recognizerService(data);
+        let obj = toBeSaved.forEach(elm => {
+            return elm.userId.split(" ")[0].toString();
+        })
+        Emotion.insertManyEmotion(obj)
           .then(emotionData => {
             emotions.push(emotionData);
             pubsub.publish(EMOTION_CHANNEL, {

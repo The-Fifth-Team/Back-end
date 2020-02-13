@@ -29,12 +29,10 @@ module.exports = async whatYouRecievFromTheFrontEnd => {
 
   async function start() {
     let toBeSavedtoDB = [];
-    let labeledFaceDescriptors;
-    if (SERVER_CACHE_MEMORY.has(process.env.DESCRIPTOR_KEY)) {
-      labeledFaceDescriptors = SERVER_CACHE_MEMORY.get(process.env.DESCRIPTOR_KEY);
-    } else {
+   
       const dbLabeledFaceDescriptors = await findAllDescriptors();
       const labeledFaceDescriptors = dbLabeledFaceDescriptors.map( record => {
+        console.log(record)
         let front = new Float32Array(128);
         let left = new Float32Array(128);
         let right = new Float32Array(128);
@@ -53,7 +51,6 @@ module.exports = async whatYouRecievFromTheFrontEnd => {
         return new faceapi.LabeledFaceDescriptors(record.userId.toString(), [front, left, right])
       });
       SERVER_CACHE_MEMORY.set(process.env.DESCRIPTOR_KEY, labeledFaceDescriptors); // maybe adds some time for how long it stays in cache, Expiry Date
-    }
     let faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
     whatYouRecievFromTheFrontEnd.forEach(fd => {
       let obj = {};
