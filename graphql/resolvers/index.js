@@ -1,6 +1,6 @@
 const cloudinary = require('cloudinary').v2;
 const jwt = require('jsonwebtoken');
-const {AuthenticationError} = require('apollo-server');
+const { AuthenticationError } = require('apollo-server');
 const User = require('../../Models/User.js');
 const Admin = require('../../Models/Admin.js');
 const Emotion = require('../../Models/Emotion.js');
@@ -9,9 +9,14 @@ const bcrypt = require('bcryptjs')
 const recognizerService = require('../../services/recognizer/recognizer.js');
 const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 const json2csv = require('../../helper_function/json2csv');
+
 //This is the Configuration for the the Cloudniray services
 //to be able to save images online
+
 require('../../SERVER_CACHE_MEMORY');
+
+const emotions = [];
+const EMOTION_CHANNEL = 'EMOTION_CHANNEL';
 
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
@@ -36,6 +41,11 @@ const _verifyToken = token => jwt.verify(token, process.env.JWT_SECRET);
 
 //Resolvers for the system which contain the Mutations and Queries for the graphql API
 const resolvers = {
+    Subscription: {
+        faceDetected: {
+            subscribe: (_, { data }, { pubsub }) => pubsub.asyncIterator(EMOTION_CHANNEL, data)
+        }
+    },
     Mutation: {
         /**
          * @async
@@ -45,44 +55,44 @@ const resolvers = {
          * @return {Promise<object|Error>} user  the User that get saved to the database, return Error if problem occurred
          * @since 1.0.0
          */
-        async uploadUser(parent, { data },) {
+        async uploadUser(parent, { data }, ) {
             const { createReadStream } = await data.photo;
-            try {
-                const result = await new Promise((resolve, reject) => {
-                    createReadStream().pipe(
-                        cloudinary.uploader.upload_stream((error, result) => {
-                            if (error) {
-                                reject(error)
-                            }
-                            resolve(result)
-                        })
-                    )
-                });
-                let user = await User.insertUser({
+            const result = await new Promise((resolve, reject) => {
+                createReadStream().pipe(
+                    cloudinary.uploader.upload_stream((error, result) => {
+                        if (error) {
+                            reject(error)
+                        }
+                        resolve(result)
+                    })
+                )
+            });
+            User.insertUser({
                     firstName: data.firstName,
                     lastName: data.lastName,
                     age: data.age,
                     gender: data.gender,
                     photoUrl: result.secure_url
-                });
-                if (!user) {
-                    return new Error("Error with inserting the user")
-                }
-                await Descriptor.insertOneDescriptor({
-                    userId: user._id,
-                    front: data.descriptors[0],
-                    left: data.descriptors[1],
-                    right: data.descriptors[2]
-                });
+                })
+                .then(userData => {
+                    return Descriptor.insertOneDescriptor({
+                        userId: userData._id,
+                        front: data.descriptors[0],
+                        left: data.descriptors[1],
+                        right: data.descriptors[2]
+                    });
+                })
+                .then(result => {
+                    console.log("User Inserted");
+                    console.log("Descriptor Inserted ");
+                    console.log(result);
+                })
+                .catch(err => {
+                    console.error(err);
+                })
                 // deletes the key for descriptors, because the cache now does not contain the most updated version of the descriptors
-                SERVER_CACHE_MEMORY[process.env.DESCRIPTOR_KEY] = undefined;
-                //this should be added to any function that well manipulate the descriptors, collations EXCEPT for querying and reading functions
-                console.log("Inserted Successful");
-                return user;
-            } catch (err) {
-                console.error(err);
-                return err;
-            }
+            SERVER_CACHE_MEMORY[process.env.DESCRIPTOR_KEY] = undefined;
+            //this should be added to any function that well manipulate the descriptors, collations EXCEPT for querying and reading functions
         },
         /**
          * @function addAdmin used to add an admin to the database
@@ -102,13 +112,18 @@ const resolvers = {
          * @since 1.0.0
          * @version 1.0.0
          */
-        async userFaceIdentifier(parent, {data}){
-            const toBeSaved = await recognizerService(data);
-            const result = await Emotion.insertManyEmotion(toBeSaved);
-            if(!result){
-                return new Error("error with fetching the Emotions")
-            }
-            return data[0].expressions;
+        userFaceIdentifier(parent, { data }, { pubsub }) {
+            const toBeSaved = recognizerService(data);
+            Emotion.insertManyEmotion(toBeSaved)
+                .then(emotionData => {
+                    emotions.push(emotionData);
+                    pubsub.publish(EMOTION_CHANNEL, {
+                        faceDetected: emotionData
+                    })
+                })
+                .catch(err => {
+                    console.error(err);
+                })
         },
 
         /**
@@ -119,22 +134,25 @@ const resolvers = {
          * @param password - password of the admin
          * @return {Promise<{token: string}|Error>} - jwt token, built based on the admin object id
          */
-        async signInAdmin (parent, { email, password }){
+        async signInAdmin(parent, { email, password }) {
             try {
-                 const admin = await Admin.findOneAdmin({email});
+                const admin = await Admin.findOneAdmin({ email });
                 const isValid = await bcrypt.compare(password, admin.password);
-                if(isValid){
-                    return {token : _signToken(admin._id)};
-                }else{
+                if (isValid) {
+                    return { token: _signToken(admin._id) };
+                } else {
                     return new AuthenticationError("EMAIL OR PASSWORD DOES NOT MATCH");
                 }
-            }catch (e) {
+            } catch (e) {
                 return e;
             }
 
         }
     },
     Query: {
+        emotions() {
+            return emotions
+        },
         /**
          * @function getAllUsers used to pull all the users from the database
          * @return {Promise<object|Error>} all the users that exists in the database, return Error if problem occurred
@@ -167,7 +185,7 @@ const resolvers = {
          * @since 1.0.0
          * @version 1.3.1
          */
-         async getPeriodEmotions(parent, {startDate, endDate},{ token }){
+        async getPeriodEmotions(parent, { startDate, endDate }, { token }) {
             // let admin = await Admin.findByIdAdmin( _verifyToken(token)._id );
             // if(!admin){
             //     return new Error("Authorized Personnel Only!")
@@ -239,7 +257,7 @@ const resolvers = {
                 startAtMin: "",
                 endAtMin: ""
             };
-            let startDateIntNext,startPeriod,endPeriod;
+            let startDateIntNext, startPeriod, endPeriod;
             while ((startDateInt < endDateInt) && (assertCounter < MAX_ITERATIONS)) {
                 assertCounter++;
                 startDateIntNext = (startDateInt + (15 * 60 * 1000));
@@ -325,7 +343,7 @@ const resolvers = {
                         surprisedStatus.endAtMin = startDateIntNext.toString();
                     }
                 }
-                if(arrayOfEmotions.length !== 0){
+                if (arrayOfEmotions.length !== 0) {
                     emotionsTotal.push(arrayOfEmotions);
                     timeStamps.push(startDateIntNext.toString());
                 }
@@ -344,7 +362,7 @@ const resolvers = {
                     disgustedSum += emotionsTotal[i][j]["disgusted"];
                     surprisedSum += emotionsTotal[i][j]["surprised"];
                 }
-                finalResult.push([ (neutralSum / emotionsTotal[i].length) , (happySum / emotionsTotal[i].length), (sadSum / emotionsTotal[i].length), (angrySum / emotionsTotal[i].length), (fearfulSum / emotionsTotal[i].length), (disgustedSum / emotionsTotal[i].length), (surprisedSum / emotionsTotal[i].length)])
+                finalResult.push([(neutralSum / emotionsTotal[i].length), (happySum / emotionsTotal[i].length), (sadSum / emotionsTotal[i].length), (angrySum / emotionsTotal[i].length), (fearfulSum / emotionsTotal[i].length), (disgustedSum / emotionsTotal[i].length), (surprisedSum / emotionsTotal[i].length)])
             }
             return {
                 averages: finalResult,
@@ -361,16 +379,16 @@ const resolvers = {
          * @version 1.0.0
          * @since 1.0.0
          */
-        async faceLogIn(parent,{data}){
+        async faceLogIn(parent, { data }) {
             try {
                 let str = await faceRecognizer(data);
-                if(!str){
+                if (!str) {
                     return new AuthenticationError("UNKNOWN USER");
                 }
                 str = str.split(" ")[0].toString();
                 const user = await User.findByIdUser(str);
-                return {token: _signToken(user._id)};
-            }catch (e) {
+                return { token: _signToken(user._id) };
+            } catch (e) {
                 return e;
             }
         },
@@ -379,9 +397,19 @@ const resolvers = {
          * @function getEmotionAveragesForLast24Hours - return the averages of all the emotions that happened in the last 24 hours
          * @return {object} - the object that contains the averages in the last hours
          */
-        async getEmotionAveragesForLast24Hours(){
-            let result = await Emotion.aggregate([{$match:{createdAt:{$gte:new Date(Date.now()-(24*60*60*1000))}}},{$group:{_id:"",neutral:{$avg:"$neutral"},happy:{$avg:"$happy"},sad:{$avg:"$sad"},
-                    angry:{$avg:"$angry"},fearful:{$avg:"$fearful"},disgusted:{$avg:"$disgusted"},surprised:{$avg:"$surprised"}}}]);
+        async getEmotionAveragesForLast24Hours() {
+            let result = await Emotion.aggregate([{ $match: { createdAt: { $gte: new Date(Date.now() - (24 * 60 * 60 * 1000)) } } }, {
+                $group: {
+                    _id: "",
+                    neutral: { $avg: "$neutral" },
+                    happy: { $avg: "$happy" },
+                    sad: { $avg: "$sad" },
+                    angry: { $avg: "$angry" },
+                    fearful: { $avg: "$fearful" },
+                    disgusted: { $avg: "$disgusted" },
+                    surprised: { $avg: "$surprised" }
+                }
+            }]);
             delete result[0]["_id"];
             return result[0];
         },
@@ -390,31 +418,29 @@ const resolvers = {
          * @function getEmotionsCsvReport - used to return all the emotions in the database as a CSV report String
          * @return {Promise<string>} - string contains a CSV report
          */
-        async getEmotionsCsvReport(){
+        async getEmotionsCsvReport() {
             let emotions = await Emotion.findEmotions({}).populate("userId");
             console.log(emotions);
             // Because of the others Hidden Attributes // Can Be seen by console.dir(nameOFYouVariable)
             // i need to extract the attributes i need to run a loop
             let result = [];
-            for (let i = 0; i < emotions.length ; i++) {
-                result.push(
-                    {
-                        userId: emotions[i].userId._id,
-                        firstName: emotions[i].userId.firstName,
-                        lastName: emotions[i].userId.lastName,
-                        gender: emotions[i].userId.gender,
-                        neutral: emotions[i].neutral,
-                        happy: emotions[i].happy,
-                        sad: emotions[i].sad,
-                        angry: emotions[i].angry,
-                        fearful: emotions[i].fearful,
-                        disgusted: emotions[i].disgusted,
-                        surprised: emotions[i].surprised
-                    })
+            for (let i = 0; i < emotions.length; i++) {
+                result.push({
+                    userId: emotions[i].userId._id,
+                    firstName: emotions[i].userId.firstName,
+                    lastName: emotions[i].userId.lastName,
+                    gender: emotions[i].userId.gender,
+                    neutral: emotions[i].neutral,
+                    happy: emotions[i].happy,
+                    sad: emotions[i].sad,
+                    angry: emotions[i].angry,
+                    fearful: emotions[i].fearful,
+                    disgusted: emotions[i].disgusted,
+                    surprised: emotions[i].surprised
+                })
             }
             return json2csv.json2CsvASync(result);
         }
     }
 };
 module.exports = resolvers;
-
