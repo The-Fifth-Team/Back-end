@@ -1,9 +1,11 @@
 const cloudinary = require('cloudinary').v2;
 const jwt = require('jsonwebtoken');
+const {AuthenticationError} = require('apollo-server');
 const User = require('../../Models/User.js');
 const Admin = require('../../Models/Admin.js');
 const Emotion = require('../../Models/Emotion.js');
 const Descriptor = require('../../Models/Descriptors.js');
+const bcrypt = require('bcryptjs')
 const recognizerService = require('../../services/recognizer/recognizer.js');
 const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 const json2csv = require('../../helper_function/json2csv');
@@ -118,15 +120,18 @@ const resolvers = {
          * @return {Promise<{token: string}|Error>} - jwt token, built based on the admin object id
          */
         async signInAdmin (parent, { email, password }){
-            const admin = await Admin.findOneAdmin({email});
-            if(!admin){
-                return new Error("Error with admin Email OR Password");
+            try {
+                 const admin = await Admin.findOneAdmin({email});
+                const isValid = await bcrypt.compare(password, admin.password);
+                if(isValid){
+                    return {token : _signToken(admin._id)};
+                }else{
+                    return new AuthenticationError("EMAIL OR PASSWORD DOES NOT MATCH");
+                }
+            }catch (e) {
+                return e;
             }
-            const isValid = await bcrypt.compare(password, admin.password);
-            if(!isValid){
-                return new Error("Error with admin Email OR Password");
-            }
-            return {token : _signToken(admin._id)};
+
         }
     },
     Query: {
@@ -234,7 +239,6 @@ const resolvers = {
                 startAtMin: "",
                 endAtMin: ""
             };
-
             let startDateIntNext,startPeriod,endPeriod;
             while ((startDateInt < endDateInt) && (assertCounter < MAX_ITERATIONS)) {
                 assertCounter++;
@@ -325,7 +329,6 @@ const resolvers = {
                     emotionsTotal.push(arrayOfEmotions);
                     timeStamps.push(startDateIntNext.toString());
                 }
-
                 startDateInt = startDateIntNext;
             }
             let finalResult = [];
@@ -352,25 +355,24 @@ const resolvers = {
         /**
          * @async
          * @function faceLogIn this function is used to check the face descriptors for a specific user,of it match ,token well be sent to the front end
-         * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
-         * @param {object} data the array of face descriptors for the user
-         * @return {object} the jwt sign-in-token to be saved in the frontend
+         * @param {object} parent - pointer which points to the parent function which called this function (IF EXISTS)
+         * @param {Array} data - the array of face descriptors for the user
+         * @return {object} the - jwt sign-in-token to be saved in the frontend
          * @version 1.0.0
          * @since 1.0.0
          */
         async faceLogIn(parent,{data}){
-                const _id = faceRecognizer(data);
-                if(!_id){
-                    console.error("SERVER-SIDE ERROR- User not identified, ERROR IN faceLogIn");
-                   return new Error("User not identified, ERROR IN faceLogIn");
+            try {
+                let str = await faceRecognizer(data);
+                if(!str){
+                    return new AuthenticationError("UNKNOWN USER");
                 }
-                const user = await User.findByIdUser(_id);
-                if(!user){
-                    console.error("SERVER-SIDE ERROR- No User Exists with the id provided, ERROR IN faceLogIn");
-                    return new Error("No User Exists with the id provided, ERROR IN faceLogIn")
-                }
-                //if everything match, token well be sent to the front-end
-            return { token: _signToken(user._id) };
+                str = str.split(" ")[0].toString();
+                const user = await User.findByIdUser(str);
+                return {token: _signToken(user._id)};
+            }catch (e) {
+                return e;
+            }
         },
         /**
          * @async
@@ -390,6 +392,7 @@ const resolvers = {
          */
         async getEmotionsCsvReport(){
             let emotions = await Emotion.findEmotions({}).populate("userId");
+            console.log(emotions);
             // Because of the others Hidden Attributes // Can Be seen by console.dir(nameOFYouVariable)
             // i need to extract the attributes i need to run a loop
             let result = [];

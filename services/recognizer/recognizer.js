@@ -1,4 +1,4 @@
-const tensorFlow = require('@tensorflow/tfjs-node');
+require('@tensorflow/tfjs-node');
 const canvas = require('canvas');
 const faceapi = require('face-api.js');
 const {findAllDescriptors} = require("../../Models/Descriptors");
@@ -15,14 +15,14 @@ faceapi.env.monkeyPatch({
   ImageData
 });
 
-module.exports = whatYouRecievFromTheFrontEnd => {
-  Promise.all([
+module.exports = async descriptorArray => {
+  return await Promise.all([
     faceapi.nets.faceRecognitionNet.loadFromDisk('models1'),
     faceapi.nets.faceLandmark68Net.loadFromDisk('models1'),
     faceapi.nets.ssdMobilenetv1.loadFromDisk('models1'),
     faceapi.nets.faceExpressionNet.loadFromDisk('models1')
   ])
-      .then(start())
+      .then(async () => await start())
       .catch(err => {
         console.log(err)
       });
@@ -30,11 +30,11 @@ module.exports = whatYouRecievFromTheFrontEnd => {
   async function start() {
     let toBeSavedtoDB = [];
     let labeledFaceDescriptors;
-    if(SERVER_CACHE_MEMORY.has(process.env.DESCRIPTOR_KEY)){
-      labeledFaceDescriptors = SERVER_CACHE_MEMORY.get(process.env.DESCRIPTOR_KEY);
+    if(SERVER_CACHE_MEMORY[process.env.DESCRIPTOR_KEY]){
+      labeledFaceDescriptors = SERVER_CACHE_MEMORY[process.env.DESCRIPTOR_KEY];
     }else{
       const dbLabeledFaceDescriptors = await findAllDescriptors();
-      const labeledFaceDescriptors = dbLabeledFaceDescriptors.map( record => {
+      labeledFaceDescriptors = dbLabeledFaceDescriptors.map( record => {
         let front = new Float32Array(128);
         let left = new Float32Array(128);
         let right = new Float32Array(128);
@@ -52,10 +52,11 @@ module.exports = whatYouRecievFromTheFrontEnd => {
         // console.log(typeof record.userId)
         return new faceapi.LabeledFaceDescriptors(record.userId.toString(), [front, left, right])
       });
-      SERVER_CACHE_MEMORY.set(process.env.DESCRIPTOR_KEY, labeledFaceDescriptors); // maybe adds some time for how long it stays in cache, Expiry Date
+      SERVER_CACHE_MEMORY[process.env.DESCRIPTOR_KEY] = labeledFaceDescriptors;
     }
+
     let faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
-    whatYouRecievFromTheFrontEnd.forEach(fd => {
+    descriptorArray.forEach( fd => {
       let obj = {};
       const bestMatch = faceMatcher.findBestMatch(fd.descriptor);
       obj.neutral = fd.expressions.neutral;

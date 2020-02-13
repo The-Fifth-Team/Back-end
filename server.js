@@ -20,7 +20,7 @@ const server = new ApolloServer({
 server.applyMiddleware({ app });
 mongoose.Promise = global.Promise;
 // Mongodb connection//
-mongoose.connect("mongodb+srv://ali-jalal:thefifthteam@cluster0-p3vu6.mongodb.net/test?retryWrites=true&w=majority", {
+mongoose.connect("mongodb://localhost:27017", {
     useCreateIndex: true,
     useNewUrlParser: true,
     useFindAndModify: false,
