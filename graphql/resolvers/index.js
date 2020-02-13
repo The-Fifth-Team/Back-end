@@ -9,7 +9,8 @@ const bcrypt = require('bcryptjs')
 const recognizerService = require('../../services/recognizer/recognizer.js');
 const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 const json2csv = require('../../helper_function/json2csv');
-
+const sendEmail = require('../../helper_function/sendEmail');
+const crypto = require('crypto');
 //This is the Configuration for the the Cloudniray services
 //to be able to save images online
 
@@ -47,6 +48,75 @@ const resolvers = {
         }
     },
     Mutation: {
+        /**
+         * @function resetPassword this function checks the hashed Token and of it's still valid, it well accept the new password, hash it and save it in the database
+         * @param {object} parent pointer which points to the parent function, in the query Or mutation order, which called this function (IF EXISTS)
+         * @param {string} token the hashed token that well be received from the previous step
+         * @param {string} password the new Password that well be saved for this specific admin
+         * @return token {string|Error} of no error happens, returns a new sign in Token
+         * @since 1.0.0
+         * @version 1.0.0
+         */
+        async resetPassword(parent, { token, password }) {
+            try {
+                const admin = await AdminFunctions.findOneAdmin({
+                    passwordResetToken: token,
+                    passwordResetTokenExpired: { $gt: Date.now() }
+                });
+                if (!admin) {
+                    return new Error("Something wrong Happened");
+                }
+                password = await bcrypt.hash(password, 8);
+                admin.password = password;
+                admin.passwordResetTokenExpired = undefined;
+                admin.passwordResetToken = undefined;
+                await admin.save();
+                return {token: _signToken(admin._id)};
+            }catch (e) {
+                return e;
+            }
+        },
+        /**
+         * @function checkToken checks the password reset token, sent back by the user, when he clicked the link in his email, and checks if it's still valid and not expired
+         * @param {object} parent pointer which points to the parent function, in the query Or mutation order, which called this function (IF EXISTS)
+         * @param {string} token the token sent back from the user, when he/she clicked the url provided
+         * @return {string|Error} hashedToken return the hashed Token to be checked in the next step of the process
+         * @since 1.0.0
+         * @version 1.0.0
+         */
+        async checkToken(parent, { token }) {
+            if (token) {
+                const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+                const admin = await Admin.findOneAdmin({
+                    passwordResetToken: hashedToken,
+                    passwordResetTokenExpired: { $gt: Date.now() }
+                });
+                if (!admin) {
+                    return new Error("Token is invalid or Expired");
+                }
+                return {token: hashedToken};
+            } else {
+                return new Error("No Token is provided")
+            }
+        },
+        /**
+         * @function forgetPassword used to send a password reset token to the user's email, in order to reset his password with it
+         * @param {object} parent pointer which points to the parent function, in the query Or mutation order, which called this function (IF EXISTS)
+         * @param {string} email of the user that forgets his/her password
+         * @return {Promise<object|Error>} return a message donating the success of sending the email OR Error of happened
+         * @since 1.0.0
+         * @version 1.0.0
+         */
+        async forgetPassword(parent, { email }) {
+            const admin = await Admin.findOneAdmin({ email });
+            if (!admin) {
+                return new Error("there is no admin with that email");
+            }
+            const resetToken = admin.createPasswordResetToken();
+            await admin.save({ validateBeforeSave: false });
+            const url = `frontend/verify/${resetToken}`;//needs updating when testing from the front end
+            return await sendEmail("any@gmail.com", "Password Reset Email", url);
+        },
         /**
          * @async
          * @function uploadUser used to save a user to the database of the system with his/her photo and face descriptors
@@ -106,9 +176,9 @@ const resolvers = {
         },
         /**
          * @async
-         * @function userFaceIdentifier checks the emotions sent from the front-end,and identify for who they belong
-         * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
-         * @param {object} data the object that contains the data needed for this mutation
+         * @function userFaceIdentifier - checks the emotions sent from the front-end,and identify for who they belong
+         * @param {object} parent - pointer which points to the parent function which called this function (IF EXISTS)
+         * @param {object} data - the object that contains the data needed for this mutation
          * @since 1.0.0
          * @version 1.0.0
          */
@@ -125,7 +195,6 @@ const resolvers = {
                     console.error(err);
                 })
         },
-
         /**
          * @async
          * @function signInAdmin - used to verify an admin sign_in and return token of valid
@@ -440,6 +509,13 @@ const resolvers = {
                 })
             }
             return json2csv.json2CsvASync(result);
+        },
+        async getAnalyticEmotion(){
+            const date24HFromNow = new Date(Date.now() - (24 * 60 * 60 * 1000));
+            const historicalEmotions = await Emotion.findEmotions({"createdAt" : {"$lt": date24HFromNow}});
+            const emotionsBefore24 = await Emotion.findEmotions({"createdAt" : {"$gte": date24HFromNow}});
+
+
         }
     }
 };

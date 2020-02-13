@@ -11,6 +11,9 @@ const typeDefs = gql`
     addAdmin(data: AdminInput!): Admin!
     userFaceIdentifier(data: [ObservationInput]!): Emotion
     signInAdmin(email: String!, password: String!): Token
+    forgetPassword(email: String!): String
+    checkToken(token: String!): Token
+    resetPassword(token: String!,password: String!): Token
   }
 
   type Query {
@@ -20,6 +23,7 @@ const typeDefs = gql`
     faceLogIn(data: [Float!]!): Token
     getEmotionAveragesForLast24Hours: Emotion!
     getEmotionsCsvReport: String!
+    getAnalyticEmotion: [Emotion]!
   }
 
   type Subscription {
