@@ -486,8 +486,12 @@ const resolvers = {
                     surprised: { $avg: "$surprised" }
                 }
             }]);
-            delete result[0]["_id"];
-            return result[0];
+            if(result.length !== 0){
+                delete result[0]["_id"];
+                return [ result[0].neutral, result[0].happy, result[0].sad, result[0].angry, result[0].fearful, result[0].disgusted, result[0].surprised ];
+            }else{
+                return new Error("There is no Emotions in the last 24 Hour")
+            }
         },
         /**
          * @async
