@@ -49,7 +49,7 @@ const _verifyToken = token => jwt.verify(token, process.env.JWT_SECRET);
 const resolvers = {
   Subscription: {
     faceDetected: {
-      subscribe: (_, __, { pubsub }) => pubsub.asyncIterator(EMOTION_CHANNEL)
+      subscribe: (_, { data }, { pubsub }) => pubsub.asyncIterator(EMOTION_CHANNEL, data)
     }
   },
   Mutation: {
@@ -138,9 +138,8 @@ const resolvers = {
           return Emotion.insertManyEmotion(extractedObj)
         })
         .then(fetchedEmotions => {
-            emotions.push(fetchedEmotions);
-            console.log(emotions)
-            fetchedEmotions.forEach(emotion => {
+          fetchedEmotions.forEach(emotion => {
+              emotions.push(emotion);
               pubsub.publish(EMOTION_CHANNEL, {
                 faceDetected: emotion
               })
@@ -183,7 +182,7 @@ const resolvers = {
     }
   },
   Query: {
-    emotions () {
+    emotions (_, __, context) {
       return emotions
     },
     /**
