@@ -5,7 +5,7 @@ const User = require('../../Models/User.js');
 const Admin = require('../../Models/Admin.js');
 const Emotion = require('../../Models/Emotion.js');
 const Descriptor = require('../../Models/Descriptors.js');
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcrypt')
 const recognizerService = require('../../services/recognizer/recognizer.js');
 const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 const json2csv = require('../../helper_function/json2csv');
@@ -60,14 +60,13 @@ const resolvers = {
          */
         async resetPassword(parent, { token, password }) {
             try {
-                const admin = await AdminFunctions.findOneAdmin({
+                const admin = await Admin.findOneAdmin({
                     passwordResetToken: token,
                     passwordResetTokenExpired: { $gt: Date.now() }
                 });
                 if (!admin) {
                     return new Error("Something wrong Happened");
                 }
-                password = await bcrypt.hash(password, 8);
                 admin.password = password;
                 admin.passwordResetTokenExpired = undefined;
                 admin.passwordResetToken = undefined;
@@ -116,7 +115,7 @@ const resolvers = {
             const resetToken = admin.createPasswordResetToken();
             await admin.save({ validateBeforeSave: false });
             const url = `frontend/verify/${resetToken}`;//needs updating when testing from the front end
-            return await sendEmail("any@gmail.com", "Password Reset Email", url);
+            return await sendEmail(email, "Password Reset Email", url);
         },
         /**
          * @async
@@ -208,6 +207,14 @@ const resolvers = {
             try {
                 const admin = await Admin.findOneAdmin({ email });
                 const isValid = await bcrypt.compare(password, admin.password);
+
+                console.log();
+                console.error("in signInAdmin");
+                console.log();
+
+                console.log(password);
+                console.warn(admin.password);
+
                 if (isValid) {
                     return { token: _signToken(admin._id) };
                 } else {
@@ -216,7 +223,6 @@ const resolvers = {
             } catch (e) {
                 return e;
             }
-
         }
     },
     Query: {

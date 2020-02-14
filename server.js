@@ -40,7 +40,7 @@ server.installSubscriptionHandlers(httpServer);
 
 mongoose.Promise = global.Promise;
 // Mongodb connection//
-mongoose.connect("mongodb://localhost:27017", {
+mongoose.connect(process.env.DATABASE_URL, {
     useCreateIndex: true,
     useNewUrlParser: true,
     useFindAndModify: false,

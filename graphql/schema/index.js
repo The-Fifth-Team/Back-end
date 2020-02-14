@@ -9,9 +9,9 @@ const typeDefs = gql`
   type Mutation {
     uploadUser(data: UserInput!): User
     addAdmin(data: AdminInput!): Admin!
-    userFaceIdentifier(data: [ObservationInput]!): Emotion
+    userFaceIdentifier(data: [ObservationInput]!): [Emotion]
     signInAdmin(email: String!, password: String!): Token
-    forgetPassword(email: String!): String
+    forgetPassword(email: String!): String!
     checkToken(token: String!): Token
     resetPassword(token: String!,password: String!): Token
   }
