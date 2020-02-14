@@ -49,11 +49,7 @@ const _verifyToken = token => jwt.verify(token, process.env.JWT_SECRET);
 const resolvers = {
   Subscription: {
     faceDetected: {
-      subscribe: (_, {
-        data
-      }, {
-        pubsub
-      }) => pubsub.asyncIterator(EMOTION_CHANNEL, data)
+      subscribe: (_, __, { pubsub }) => pubsub.asyncIterator(EMOTION_CHANNEL)
     }
   },
   Mutation: {
@@ -129,21 +125,27 @@ const resolvers = {
      * @version 1.0.0
      */
     async userFaceIdentifier(parent, { data }, { pubsub }) {
-      const toBeSaved = await recognizerService(data);
-      let extractedObj = toBeSaved.map(elm => {
-        if (elm.userId.split(" ")[0].toString() !== 'unknown') {
-          elm.userId = elm.userId.split(" ")[0].toString();
-          return elm;
-        }
-      })
-
-      Emotion.insertManyEmotion(extractedObj)
-        .then(emotionData => {
-          emotions.push(emotionData);
-          console.log(emotionData)
-          pubsub.publish(EMOTION_CHANNEL, {
-            faceDetected: emotionData
+      return recognizerService(data)
+        .then(toBeSaved => {
+          return toBeSaved.map(elm => {
+            if (elm.userId.split(" ")[0].toString() !== 'unknown') {
+              elm.userId = elm.userId.split(" ")[0].toString();
+              return elm;
+            }
           })
+        })
+        .then(extractedObj => {
+          return Emotion.insertManyEmotion(extractedObj)
+        })
+        .then(fetchedEmotions => {
+            emotions.push(fetchedEmotions);
+            console.log(emotions)
+            fetchedEmotions.forEach(emotion => {
+              pubsub.publish(EMOTION_CHANNEL, {
+                faceDetected: emotion
+              })
+            })
+            return fetchedEmotions
         })
         .catch(err => {
           console.error(err);
@@ -181,7 +183,7 @@ const resolvers = {
     }
   },
   Query: {
-    emotions() {
+    emotions () {
       return emotions
     },
     /**
