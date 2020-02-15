@@ -1,4 +1,4 @@
-require('@tensorflow/tfjs-node');
+// require('@tensorflow/tfjs-node');
 const canvas = require('canvas');
 const faceapi = require('face-api.js');
 const { findAllDescriptors } = require("../../Models/Descriptors");
@@ -63,8 +63,8 @@ module.exports = async descriptorArray => {
             obj.happy = fd.expressions.happy;
             obj.sad = fd.expressions.sad;
             obj.angry = fd.expressions.angry;
-            obj.fearful = fd.expressions.fear;
-            obj.disgusted = fd.expressions.disgust;
+            obj.fearful = fd.expressions.fearful;
+            obj.disgusted = fd.expressions.disgusted;
             obj.surprised = fd.expressions.surprised;
             obj.userId = bestMatch.toString();
             toBeSavedtoDB.push(obj)
