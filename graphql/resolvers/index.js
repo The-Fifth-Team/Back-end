@@ -63,12 +63,8 @@ const resolvers = {
      * @return {Promise<object|Error>} user  the User that get saved to the database, return Error if problem occurred
      * @since 1.0.0
      */
-    async uploadUser(parent, {
-      data
-    }, ) {
-      const {
-        createReadStream
-      } = await data.photo;
+    async uploadUser(parent, {data}, ) {
+      const {createReadStream} = await data.photo;
       const result = await new Promise((resolve, reject) => {
         createReadStream().pipe(
           cloudinary.uploader.upload_stream((error, result) => {
@@ -101,12 +97,11 @@ const resolvers = {
         })
         .catch(err => {
           console.error(err);
-        })
+        });
       // deletes the key for descriptors, because the cache now does not contain the most updated version of the descriptors
       SERVER_CACHE_MEMORY[process.env.DESCRIPTOR_KEY] = undefined;
       //this should be added to any function that well manipulate the descriptors, collations EXCEPT for querying and reading functions
     },
-    Mutation: {
         /**
          * @function resetPassword this function checks the hashed Token and of it's still valid, it well accept the new password, hash it and save it in the database
          * @param {object} parent pointer which points to the parent function, in the query Or mutation order, which called this function (IF EXISTS)
@@ -176,53 +171,6 @@ const resolvers = {
             return await sendEmail(email, "Password Reset Email", url);
         },
         /**
-         * @async
-         * @function uploadUser used to save a user to the database of the system with his/her photo and face descriptors
-         * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
-         * @param {object} data  the object that contains the data needed for this mutation
-         * @return {Promise<object|Error>} user  the User that get saved to the database, return Error if problem occurred
-         * @since 1.0.0
-         */
-        async uploadUser(parent, { data }, ) {
-            const { createReadStream } = await data.photo;
-            const result = await new Promise((resolve, reject) => {
-                createReadStream().pipe(
-                    cloudinary.uploader.upload_stream((error, result) => {
-                        if (error) {
-                            reject(error)
-                        }
-                        resolve(result)
-                    })
-                )
-            });
-            User.insertUser({
-                    firstName: data.firstName,
-                    lastName: data.lastName,
-                    age: data.age,
-                    gender: data.gender,
-                    photoUrl: result.secure_url
-                })
-                .then(userData => {
-                    return Descriptor.insertOneDescriptor({
-                        userId: userData._id,
-                        front: data.descriptors[0],
-                        left: data.descriptors[1],
-                        right: data.descriptors[2]
-                    });
-                })
-                .then(result => {
-                    console.log("User Inserted");
-                    console.log("Descriptor Inserted ");
-                    console.log(result);
-                })
-                .catch(err => {
-                    console.error(err);
-                })
-                // deletes the key for descriptors, because the cache now does not contain the most updated version of the descriptors
-            SERVER_CACHE_MEMORY[process.env.DESCRIPTOR_KEY] = undefined;
-            //this should be added to any function that well manipulate the descriptors, collations EXCEPT for querying and reading functions
-        },
-        /**
          * @function addAdmin used to add an admin to the database
          * @param {object} parent pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data  the object that contains the data needed for this mutation, admin object
@@ -237,6 +185,7 @@ const resolvers = {
          * @function userFaceIdentifier - checks the emotions sent from the front-end,and identify for who they belong
          * @param {object} parent - pointer which points to the parent function which called this function (IF EXISTS)
          * @param {object} data - the object that contains the data needed for this mutation
+         * @param {object} pubsub - to publish an event to the emotion channel
          * @since 1.0.0
          * @version 1.0.0
          */
@@ -262,12 +211,11 @@ const resolvers = {
                   pubsub.publish(EMOTION_CHANNEL, {
                     faceDetected: emotion
                   })
-                })
+                });
                 return fetchedEmotions
             })
             .catch(err => {
-              console.error(err);
-              return 
+              return err;
             })
         },
         /**
@@ -299,11 +247,9 @@ const resolvers = {
                 return e;
             }
         }
-    }
   },
   Query: {
     emotions (_, __, context) {
-      console.log(emotions);
       return emotions
     },
     /**
@@ -582,7 +528,6 @@ const resolvers = {
          */
         async getEmotionsCsvReport() {
             let emotions = await Emotion.findEmotions({}).populate("userId");
-            console.log(emotions);
             // Because of the others Hidden Attributes // Can Be seen by console.dir(nameOFYouVariable)
             // i need to extract the attributes i need to run a loop
             let result = [];
@@ -610,109 +555,6 @@ const resolvers = {
 
             return zees(recentData,historicalData);
         }
-        finalResult.push([(neutralSum / emotionsTotal[i].length), (happySum / emotionsTotal[i].length), (sadSum / emotionsTotal[i].length), (angrySum / emotionsTotal[i].length), (fearfulSum / emotionsTotal[i].length), (disgustedSum / emotionsTotal[i].length), (surprisedSum / emotionsTotal[i].length)])
       }
-      return {
-        averages: finalResult,
-        status: [neutralStatus, happyStatus, sadStatus, angryStatus, fearfulStatus, disgustedStatus, surprisedStatus],
-        timeStamps
-      }
-    },
-    /**
-     * @async
-     * @function faceLogIn this function is used to check the face descriptors for a specific user,of it match ,token well be sent to the front end
-     * @param {object} parent - pointer which points to the parent function which called this function (IF EXISTS)
-     * @param {Array} data - the array of face descriptors for the user
-     * @return {object} the - jwt sign-in-token to be saved in the frontend
-     * @version 1.0.0
-     * @since 1.0.0
-     */
-    async faceLogIn(parent, {
-      data
-    }) {
-      try {
-        let str = await faceRecognizer(data);
-        if (!str) {
-          return new AuthenticationError("UNKNOWN USER");
-        }
-        str = str.split(" ")[0].toString();
-        const user = await User.findByIdUser(str);
-        return {
-          token: _signToken(user._id)
-        };
-      } catch (e) {
-        return e;
-      }
-    },
-    /**
-     * @async
-     * @function getEmotionAveragesForLast24Hours - return the averages of all the emotions that happened in the last 24 hours
-     * @return {object} - the object that contains the averages in the last hours
-     */
-    async getEmotionAveragesForLast24Hours() {
-      let result = await Emotion.aggregate([{
-        $match: {
-          createdAt: {
-            $gte: new Date(Date.now() - (24 * 60 * 60 * 1000))
-          }
-        }
-      }, {
-        $group: {
-          _id: "",
-          neutral: {
-            $avg: "$neutral"
-          },
-          happy: {
-            $avg: "$happy"
-          },
-          sad: {
-            $avg: "$sad"
-          },
-          angry: {
-            $avg: "$angry"
-          },
-          fearful: {
-            $avg: "$fearful"
-          },
-          disgusted: {
-            $avg: "$disgusted"
-          },
-          surprised: {
-            $avg: "$surprised"
-          }
-        }
-      }]);
-      delete result[0]["_id"];
-      return result[0];
-    },
-    /**
-     * @async
-     * @function getEmotionsCsvReport - used to return all the emotions in the database as a CSV report String
-     * @return {Promise<string>} - string contains a CSV report
-     */
-    async getEmotionsCsvReport() {
-      let emotions = await Emotion.findEmotions({}).populate("userId");
-      // console.log(emotions);
-      // Because of the others Hidden Attributes // Can Be seen by console.dir(nameOFYouVariable)
-      // i need to extract the attributes i need to run a loop
-      let result = [];
-      for (let i = 0; i < emotions.length; i++) {
-        result.push({
-          userId: emotions[i].userId._id,
-          firstName: emotions[i].userId.firstName,
-          lastName: emotions[i].userId.lastName,
-          gender: emotions[i].userId.gender,
-          neutral: emotions[i].neutral,
-          happy: emotions[i].happy,
-          sad: emotions[i].sad,
-          angry: emotions[i].angry,
-          fearful: emotions[i].fearful,
-          disgusted: emotions[i].disgusted,
-          surprised: emotions[i].surprised
-        })
-      }
-      return json2csv.json2CsvASync(result);
-    }
-  }
 };
 module.exports = resolvers;
