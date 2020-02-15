@@ -21,6 +21,7 @@
         "@tensorflow/tfjs-node": "^1.5.2",
         "apollo-server": "^2.10.0",
         "apollo-server-express": "^2.9.16",
+        "bcrypt": "^3.0.8",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.19.0",
         "canvas": "^2.6.1",
