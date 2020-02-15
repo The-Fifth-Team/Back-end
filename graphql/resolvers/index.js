@@ -131,6 +131,8 @@ const resolvers = {
             if (elm.userId.split(" ")[0].toString() !== 'unknown') {
               elm.userId = elm.userId.split(" ")[0].toString();
               return elm;
+            } else {
+              throw new Error('User unrecognized');
             }
           })
         })
@@ -139,6 +141,7 @@ const resolvers = {
         })
         .then(fetchedEmotions => {
           fetchedEmotions.forEach(emotion => {
+              console.log('am emotion', emotion);
               emotions.push(emotion);
               pubsub.publish(EMOTION_CHANNEL, {
                 faceDetected: emotion
@@ -148,6 +151,7 @@ const resolvers = {
         })
         .catch(err => {
           console.error(err);
+          return 
         })
     },
 
@@ -183,6 +187,7 @@ const resolvers = {
   },
   Query: {
     emotions (_, __, context) {
+      console.log(emotions);
       return emotions
     },
     /**
@@ -481,7 +486,7 @@ const resolvers = {
      */
     async getEmotionsCsvReport() {
       let emotions = await Emotion.findEmotions({}).populate("userId");
-      console.log(emotions);
+      // console.log(emotions);
       // Because of the others Hidden Attributes // Can Be seen by console.dir(nameOFYouVariable)
       // i need to extract the attributes i need to run a loop
       let result = [];
