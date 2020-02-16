@@ -64,6 +64,7 @@ const resolvers = {
      * @since 1.0.0
      */
     async uploadUser(parent, {data}, ) {
+      console.log(data);
       const {createReadStream} = await data.photo;
       const result = await new Promise((resolve, reject) => {
         createReadStream().pipe(

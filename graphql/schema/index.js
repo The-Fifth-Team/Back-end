@@ -7,7 +7,7 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    uploadUser(data: UserInput!): Token
+    uploadUser(data: UserInput!): User
     addAdmin(data: AdminInput!): Admin!
     userFaceIdentifier(data: [ObservationInput]!): [Emotion]
     signInAdmin(email: String!, password: String!): Token
