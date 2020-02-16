@@ -485,6 +485,7 @@ const resolvers = {
          * @since 1.0.0
          */
         async faceLogIn(parent, { data }) {
+            console.log(data)
             try {
                 let str = await faceRecognizer(data);
                 if (!str) {
