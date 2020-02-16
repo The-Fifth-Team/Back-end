@@ -7,7 +7,7 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    uploadUser(data: UserInput!): Token
+    uploadUser(data: UserInput!): User
     addAdmin(data: AdminInput!): Admin!
     userFaceIdentifier(data: [ObservationInput]!): [Emotion]
     signInAdmin(email: String!, password: String!): Token
@@ -20,7 +20,7 @@ const typeDefs = gql`
     emotions: [Emotion]!
     getAllUsers: [User]!
     getPeriodEmotions(startDate: String!, endDate: String!): RiverChartReturnType
-    faceLogIn(data: [Float!]!): Token
+    faceLogIn(data: [Float]): Token
     getEmotionAveragesForLast24Hours: [Float!]!
     getEmotionsCsvReport: String!
     getAnalyticEmotion: [Emotion]!

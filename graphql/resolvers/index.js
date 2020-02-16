@@ -64,6 +64,7 @@ const resolvers = {
      * @since 1.0.0
      */
     async uploadUser(parent, {data}, ) {
+      console.log(data);
       const {createReadStream} = await data.photo;
       const result = await new Promise((resolve, reject) => {
         createReadStream().pipe(
@@ -484,6 +485,7 @@ const resolvers = {
          * @since 1.0.0
          */
         async faceLogIn(parent, { data }) {
+            console.log(data)
             try {
                 let str = await faceRecognizer(data);
                 if (!str) {
