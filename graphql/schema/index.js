@@ -24,6 +24,7 @@ const typeDefs = gql`
     getEmotionAveragesForLast24Hours: [Float!]!
     getEmotionsCsvReport: String!
     getAnalyticEmotion: [Emotion]!
+    getEmotions24Hours: [Emotion]!  
   }
 
   type Subscription {

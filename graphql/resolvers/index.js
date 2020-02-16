@@ -554,7 +554,11 @@ const resolvers = {
             const recentData = await Emotion.findEmotions({"createdAt" : {"$gte": date24HFromNow}});
 
             return zees(recentData,historicalData);
-        }
+        },
+      async getEmotions24Hours(){
+            return Emotion.findEmotions({ "createdAt": {"$gte": new Date(Date.now() - (24 * 60 * 60 * 1000))}
+            })
+      }
       }
 };
 module.exports = resolvers;
