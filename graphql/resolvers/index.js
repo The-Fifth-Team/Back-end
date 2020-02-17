@@ -249,8 +249,8 @@ const resolvers = {
         }
   },
   Query: {
-    emotions (_, __, context) {
-      return emotions
+      getAllEmotions (_, __, context) {
+      return Emotion.findEmotions({});
     },
     /**
      * @function getAllUsers used to pull all the users from the database
@@ -284,12 +284,7 @@ const resolvers = {
      * @since 1.0.0
      * @version 1.3.1
      */
-    async getPeriodEmotions(parent, {
-      startDate,
-      endDate
-    }, {
-      token
-    }) {
+    async getPeriodEmotions(parent, {startDate, endDate}, {token}) {
       // let admin = await Admin.findByIdAdmin( _verifyToken(token)._id );
       // if(!admin){
       //     return new Error("Authorized Personnel Only!")
