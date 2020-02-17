@@ -209,7 +209,6 @@ const resolvers = {
               })
             .then(fetchedEmotions => {
               fetchedEmotions.forEach(emotion => {
-                  console.log('am emotion', emotion);
                   pubsub.publish(EMOTION_CHANNEL, {
                     faceDetected: emotion
                   })
@@ -554,11 +553,7 @@ const resolvers = {
       async getEmotions24Hours(){
             return Emotion.findEmotions({ "createdAt": {"$gte": new Date(Date.now() - (24 * 60 * 60 * 1000))}
             })
-      },
-      async testToken(parent, data, { token }){
-            const payload = _verifyToken(token);
-          console.log(parent)
-        }
+         }
       }
 };
 module.exports = resolvers;
