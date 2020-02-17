@@ -8,10 +8,10 @@ const typeDefs = require('./graphql/schema');
 const resolvers = require('./graphql/resolvers');
 // const PORT = process.env.PORT || 4000;
 const app = express();
-const cors = require('cors');
+
 
 app.use(express.json());
-app.use(cors());
+
 
 const {
   createServer
@@ -28,15 +28,9 @@ dotenv.config({
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({
-    req,
-    res
-  }) => ({
-    req,
-    res,
-    pubsub
-  }),
-
+  context: ({req}) => {
+    return {token : req.headers.authorization , pubsub}
+  },
   subscriptions: {
     onConnect: (connectionParams, webSocket, context) => {
       // Client connection

@@ -229,9 +229,12 @@ const resolvers = {
          */
         async signInAdmin(parent, { email, password }) {
             try {
+                console.log(email, password)
                 const admin = await Admin.findOneAdmin({ email });
+                if(!admin){
+                    return new AuthenticationError("No admin with that email");
+                }
                 const isValid = await bcrypt.compare(password, admin.password);
-                console.error("in signInAdmin");
                 console.log(password);
                 console.warn(admin.password);
 
@@ -548,11 +551,17 @@ const resolvers = {
             const date24HFromNow = new Date(Date.now() - (24 * 60 * 60 * 1000));
             const historicalData = await Emotion.findEmotions({"createdAt" : {"$lt": date24HFromNow}});
             const recentData = await Emotion.findEmotions({"createdAt" : {"$gte": date24HFromNow}});
-            return zees(recentData,historicalData);
+            return zees(recentData, historicalData);
         },
       async getEmotions24Hours(){
             return Emotion.findEmotions({ "createdAt": {"$gte": new Date(Date.now() - (24 * 60 * 60 * 1000))}
             })
+         },
+      async verfiy(_,__,{token}){
+          console.log("HERE");
+          console.log(token);
+          return token;
+
          }
       }
 };
