@@ -7,7 +7,7 @@ const User = require('../../Models/User.js');
 const Admin = require('../../Models/Admin.js');
 const Emotion = require('../../Models/Emotion.js');
 const Descriptor = require('../../Models/Descriptors.js');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 const recognizerService = require('../../services/recognizer/recognizer.js');
 const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 const json2csv = require('../../helper_function/json2csv');
@@ -204,10 +204,12 @@ const resolvers = {
             .then(extractedObj => {
               return Emotion.insertManyEmotion(extractedObj)
             })
+            .then(resolvedEmotions => {
+              return resolvedEmotions.populate("userId");
+              })
             .then(fetchedEmotions => {
               fetchedEmotions.forEach(emotion => {
                   console.log('am emotion', emotion);
-                  emotions.push(emotion);
                   pubsub.publish(EMOTION_CHANNEL, {
                     faceDetected: emotion
                   })
@@ -230,11 +232,7 @@ const resolvers = {
             try {
                 const admin = await Admin.findOneAdmin({ email });
                 const isValid = await bcrypt.compare(password, admin.password);
-
-                console.log();
                 console.error("in signInAdmin");
-                console.log();
-
                 console.log(password);
                 console.warn(admin.password);
 
@@ -282,93 +280,94 @@ const resolvers = {
      * @param token - the admin token sent from the front-end
      * @return {Promise<object|Error>} object contains the array of arrays of the averages, and the Noise Emotions
      * @since 1.0.0
-     * @version 1.3.1
+     * @version 2.3.1
      */
     async getPeriodEmotions(parent, {startDate, endDate}, {token}) {
-      // let admin = await Admin.findByIdAdmin( _verifyToken(token)._id );
-      // if(!admin){
-      //     return new Error("Authorized Personnel Only!")
-      // }
-      let startDateInt = parseInt(startDate); // INT type
-      let endDateInt = parseInt(endDate); // INT type
-      let timeStamps = [];
-      startDate = new Date(startDateInt); // Date type
-      endDate = new Date(endDateInt); // Date type
+        try {
+            let admin = await Admin.findByIdAdmin( _verifyToken(token)._id );
+            if(!admin){
+                return new AuthenticationError("Authorized Personnel Only!")
+            }
+            let startDateInt = parseInt(startDate); // INT type
+            let endDateInt = parseInt(endDate); // INT type
+            let timeStamps = [];
+            startDate = new Date(startDateInt); // Date type
+            endDate = new Date(endDateInt); // Date type
 
-      let arrayOfEmotions;
-      let emotionsTotal = [];
-      let assertCounter = 0;
-      const MAX_ITERATIONS = 10000;
+            let arrayOfEmotions;
+            let emotionsTotal = [];
+            let assertCounter = 0;
+            const MAX_ITERATIONS = 10000;
 
-      let neutralStatus = {
-        maxValue: 0,
-        minValue: 1,
-        startAtMax: "",
-        endAtMax: "",
-        startAtMin: "",
-        endAtMin: ""
-      };
-      let happyStatus = {
-        maxValue: 0,
-        minValue: 1,
-        startAtMax: "",
-        endAtMax: "",
-        startAtMin: "",
-        endAtMin: ""
-      };
-      let sadStatus = {
-        maxValue: 0,
-        minValue: 1,
-        startAtMax: "",
-        endAtMax: "",
-        startAtMin: "",
-        endAtMin: ""
-      };
-      let angryStatus = {
-        maxValue: 0,
-        minValue: 1,
-        startAtMax: "",
-        endAtMax: "",
-        startAtMin: "",
-        endAtMin: ""
-      };
-      let fearfulStatus = {
-        maxValue: 0,
-        minValue: 1,
-        startAtMax: "",
-        endAtMax: "",
-        startAtMin: "",
-        endAtMin: ""
-      };
-      let disgustedStatus = {
-        maxValue: 0,
-        minValue: 1,
-        startAtMax: "",
-        endAtMax: "",
-        startAtMin: "",
-        endAtMin: ""
-      };
-      let surprisedStatus = {
-        maxValue: 0,
-        minValue: 1,
-        startAtMax: "",
-        endAtMax: "",
-        startAtMin: "",
-        endAtMin: ""
-      };
-      let startDateIntNext, startPeriod, endPeriod;
-      while ((startDateInt < endDateInt) && (assertCounter < MAX_ITERATIONS)) {
-        assertCounter++;
-        startDateIntNext = (startDateInt + (15 * 60 * 1000));
-        startPeriod = new Date(startDateInt);
-        endPeriod = new Date(startDateIntNext);
+            let neutralStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let happyStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let sadStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let angryStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let fearfulStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let disgustedStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let surprisedStatus = {
+                maxValue: 0,
+                minValue: 1,
+                startAtMax: "",
+                endAtMax: "",
+                startAtMin: "",
+                endAtMin: ""
+            };
+            let startDateIntNext, startPeriod, endPeriod;
+            while ((startDateInt < endDateInt) && (assertCounter < MAX_ITERATIONS)) {
+                assertCounter++;
+                startDateIntNext = (startDateInt + (15 * 60 * 1000));
+                startPeriod = new Date(startDateInt);
+                endPeriod = new Date(startDateIntNext);
 
-        arrayOfEmotions = await Emotion.findEmotions({
-          "createdAt": {
-            "$gte": startPeriod,
-            "$lt": endPeriod
-          }
-        });
+                arrayOfEmotions = await Emotion.findEmotions({
+                    "createdAt": {
+                        "$gte": startPeriod,
+                        "$lt": endPeriod
+                    }
+                });
 
                 for (let i = 0; i < arrayOfEmotions.length; i++) {
                     if (arrayOfEmotions[i]["neutral"] > neutralStatus.maxValue) {
@@ -468,6 +467,9 @@ const resolvers = {
                 status: [neutralStatus, happyStatus, sadStatus, angryStatus, fearfulStatus, disgustedStatus, surprisedStatus],
                 timeStamps
             }
+        }catch (e) {
+            return e;
+        }
         },
         /**
          * @async
@@ -547,13 +549,16 @@ const resolvers = {
             const date24HFromNow = new Date(Date.now() - (24 * 60 * 60 * 1000));
             const historicalData = await Emotion.findEmotions({"createdAt" : {"$lt": date24HFromNow}});
             const recentData = await Emotion.findEmotions({"createdAt" : {"$gte": date24HFromNow}});
-
             return zees(recentData,historicalData);
         },
       async getEmotions24Hours(){
             return Emotion.findEmotions({ "createdAt": {"$gte": new Date(Date.now() - (24 * 60 * 60 * 1000))}
             })
-      }
+      },
+      async testToken(parent, data, { token }){
+            const payload = _verifyToken(token);
+          console.log(parent)
+        }
       }
 };
 module.exports = resolvers;
