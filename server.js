@@ -26,9 +26,14 @@ dotenv.config({
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({req}) => {
-    return {token : req.headers.authorization, pubsub}
-  },
+  context: ({
+    req,
+    res
+  }) => ({
+    req,
+    res,
+    pubsub
+  }),
   subscriptions: {
     onConnect: (connectionParams, webSocket, context) => {
       // Client connection
