@@ -9,9 +9,7 @@ const resolvers = require('./graphql/resolvers');
 // const PORT = process.env.PORT || 4000;
 const app = express();
 
-
 app.use(express.json());
-
 
 const {
   createServer
@@ -29,7 +27,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({req}) => {
-    return {token : req.headers.authorization , pubsub}
+    return {token : req.headers.authorization, pubsub}
   },
   subscriptions: {
     onConnect: (connectionParams, webSocket, context) => {
