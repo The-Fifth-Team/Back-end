@@ -290,10 +290,10 @@ const resolvers = {
      */
     async getPeriodEmotions(parent, {startDate, endDate}, {token}) {
         try {
-            let admin = await Admin.findByIdAdmin( _verifyToken(token)._id );
-            if(!admin){
-                return new AuthenticationError("Authorized Personnel Only!")
-            }
+            // let admin = await Admin.findByIdAdmin( _verifyToken(token)._id );
+            // if(!admin){
+            //     return new AuthenticationError("Authorized Personnel Only!")
+            // }
             let startDateInt = parseInt(startDate); // INT type
             let endDateInt = parseInt(endDate); // INT type
             let timeStamps = [];
