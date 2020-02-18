@@ -17,13 +17,16 @@ const typeDefs = gql`
   }
 
   type Query {
-    emotions: [Emotion]!
+    getAllEmotions: [Emotion]!
+    emotions: [Emotion]
     getAllUsers: [User]!
     getPeriodEmotions(startDate: String!, endDate: String!): RiverChartReturnType
     faceLogIn(data: [Float]): Token
     getEmotionAveragesForLast24Hours: [Float!]!
     getEmotionsCsvReport: String!
     getAnalyticEmotion: [Emotion]!
+    getEmotions24Hours: [Emotion]!
+    verfiy: String  
   }
 
   type Subscription {
