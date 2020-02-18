@@ -17,6 +17,7 @@ const typeDefs = gql`
   }
 
   type Query {
+    emotions: [Emotion]
     getAllEmotions: [Emotion]!
     getAllUsers: [User]!
     getPeriodEmotions(startDate: String!, endDate: String!): RiverChartReturnType

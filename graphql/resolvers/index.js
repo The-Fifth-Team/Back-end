@@ -216,7 +216,8 @@ const resolvers = {
                 return fetchedEmotions
             })
             .catch(err => {
-              return err;
+                //was return err
+                console.log(err)
             })
         },
         /**
@@ -249,6 +250,9 @@ const resolvers = {
         }
   },
   Query: {
+      emotions(){
+          return emotions
+      },
       getAllEmotions (_, __, context) {
       return Emotion.findEmotions({});
     },
@@ -492,7 +496,8 @@ const resolvers = {
                 const user = await User.findByIdUser(str);
                 return { token: _signToken(user._id) };
             } catch (e) {
-                return e;
+                //was return e
+                console.log(e)
             }
         },
         /**

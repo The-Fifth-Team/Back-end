@@ -54,7 +54,7 @@ module.exports = async descriptorArray => {
             SERVER_CACHE_MEMORY[process.env.DESCRIPTOR_KEY] = labeledFaceDescriptors;
         }
 
-        let faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
+        let faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.45);
         const bestMatch = faceMatcher.findBestMatch(descriptorArray);
         if (bestMatch.toString().toLowerCase() !== "unknown") {
             return bestMatch.toString(); //_id
