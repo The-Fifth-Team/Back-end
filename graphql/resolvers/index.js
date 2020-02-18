@@ -51,7 +51,7 @@ const _verifyToken = token => jwt.verify(token, process.env.JWT_SECRET);
 const resolvers = {
   Subscription: {
     faceDetected: {
-      subscribe: (_, { data }, { pubsub }) => pubsub.asyncIterator(EMOTION_CHANNEL, data)
+      subscribe: (_, __, { pubsub }) => pubsub.asyncIterator(EMOTION_CHANNEL)
     }
   },
   Mutation: {
@@ -205,11 +205,12 @@ const resolvers = {
             .then(extractedObj => {
               return Emotion.insertManyEmotion(extractedObj)
             })
-            .then(resolvedEmotions => {
-              return resolvedEmotions.populate("userId");
-              })
+            // .then(resolvedEmotions => {
+            //   return resolvedEmotions.populate("userId");
+            // })
             .then(fetchedEmotions => {
               fetchedEmotions.forEach(emotion => {
+                  emotions.push(emotion)
                   pubsub.publish(EMOTION_CHANNEL, {
                     faceDetected: emotion
                   })
@@ -250,8 +251,11 @@ const resolvers = {
         }
   },
   Query: {
-      getAllEmotions (_, __, context) {
+    getAllEmotions (_, __, context) {
       return Emotion.findEmotions({});
+    },
+    emotions (_, __, context) {
+      return emotions;
     },
     /**
      * @function getAllUsers used to pull all the users from the database

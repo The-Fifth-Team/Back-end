@@ -18,6 +18,7 @@ const typeDefs = gql`
 
   type Query {
     getAllEmotions: [Emotion]!
+    emotions: [Emotion]
     getAllUsers: [User]!
     getPeriodEmotions(startDate: String!, endDate: String!): RiverChartReturnType
     faceLogIn(data: [Float]): Token
@@ -25,7 +26,7 @@ const typeDefs = gql`
     getEmotionsCsvReport: String!
     getAnalyticEmotion: [Emotion]!
     getEmotions24Hours: [Emotion]!
-      verfiy: String  
+    verfiy: String  
   }
 
   type Subscription {

@@ -37,6 +37,7 @@ const ZScore2Percentage = (z) => {
     return Math.floor((2 * sum)*100)
 };
 const zees = (recentData, historicalData) => {
+    if (historicalData.length === 0) return;
     let avg = {}, standardDeviation ={}, outcome = {};
     let acc = emotionsMapper(historicalData);
     let result = emotionsMapper(recentData);
