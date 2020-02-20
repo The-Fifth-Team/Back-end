@@ -1,24 +1,34 @@
-
-The Fifth:
-
+# The Fifth Team:
 This project aims to:
  - To stream a flux of detected emotions of all individuals in a group into a Database.
  - Carry out cluster analysis on the data to divide the group into various subgroups.
 
-Motivation:
-The emotional health of team members is a good indicator to weather the team reaches their
+  ![](./gif.gif)
+
+## Group Members
+* ### Abobker Elaghel – Product Owner
+* ### Ahmed Wheida – Scrum Master
+* ### Ali Jalal
+* ### Jihed Abdelly
+
+
+### Description
+The Idea of the project is to automate and/or facilitate the process of checking the mental state/health of a specific institution, workspace, school, etc.
+By constantly checking and analyzing the face expressions, of the personnel who work and/or study in that specific place.
+And send that data to the superior authority of that place or the concerned party to be psychoanalyzed.
+Also, real-time monitoring and analyzing, of all the cameras monitoring personnel, students, workers etc. available in the interface connected to the database.
+
+### Motivation:
+The emotional health of team members is a good indicator of whether the team reaches its
 objective or not.
-At my workplace we are required to fill-out emotional health survey twice a day. The issue
-is that I can deliberately wrongfully fill out the simple survey. However, I would not be
+At my workplace, we are required to fill-out emotional health survey twice a day.
+ The issue is that I can deliberately wrongfully fill out the simple survey. However, I would not be
 able to express disingenuous facial expression for the whole time.
-
-
 
 Build status
 Build status of continuous integration i.e. travis, appveyor etc. Ex. -
 
-Structure of the App
-
+### Structure of the App
 src
 │   server/server.js    # App entry point
 └───GraphQL             # GraphQL controller for app endpoint
@@ -28,47 +38,37 @@ src
 └───tests               # All the tests are here
 
 
-Code style
-If you're using any code style like xo, standard etc. That will help others while contributing to your project. Ex. -
-
+### Code style
+MDB [mdbootstrap](https://mdbootstrap.com/)
+Bootstrap [bootstrap]([https://getbootstrap.com/](https://getbootstrap.com/))
 js-standard-style
-
-Screenshots
-Include logo/demo screenshot etc.
 
 Tech/framework used
 VueJS, GraphQl, Express, NodeJs, MongoDB
 
-Built with
-
+### Built with
 javascript
 
-Features
--What makes your project stand out?
+### Features
+* Face Recognition - identify who is the person through his face
+* Emotional identification - can recognize of the person looking at the camera is Happy, Sad, Neutral, Surprised, Angry, fearful or disgusted
+* has Multiple Charts, and Bar chart, River chart, Radar charts, etc..., to see chronological statistics of the emotions during a time period
+* Cluster analysis on the data
+* Has complete admin Dashboard, with the charts mounted above and other features, jwt token, CSV report downloading, password reset functionality, etc...
 
-Code Example
--Show what the library does as concisely as possible, developers should be able to figure out how your project solves their problem by looking at the code example. Make sure the API you are showing off is obvious, and that your code is short and concise.
-
-Installation
-Provide step by step series of examples and explanations about how to get a development env running.
-
-API Reference
-Depending on the size of the project, if it is small and simple enough the reference docs can be added to the README. For medium size to larger projects it is important to at least provide a link to where the API reference docs live.
+### API Reference
+Face Api reference [GitHub](https://github.com/justadudewhohacks/face-api.js/)
 
 Tests
-Describe and show how to run the tests with code examples.
+1. Fork
+2. Clone it
+3. run `npm i` in the terminal inside of the project file
+4. run `npm test`
 
-How to use?
-If people like your project they’ll want to learn how they can use it. To do so include step by step guide to use your project.
+### How to use?
+1. Fork
+2. Clone it
+3. run `npm i` in the terminal inside of the project file
+4. run `npm start`
 
-Contribute
-Let people know how they can contribute into your project. A contributing guideline will be a big plus.
-
-Credits
-Give proper credits. This could be a link to any repo which inspired you to build this project, any blogposts or links to people who contrbuted in this project.
-
-Anything else that seems useful
-License
-A short snippet describing the license (MIT, Apache etc)
-
-MIT © The-Fifth
+## The-Fifth

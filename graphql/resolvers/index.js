@@ -23,9 +23,9 @@ const emotions = [];
 const EMOTION_CHANNEL = 'EMOTION_CHANNEL';
 
 cloudinary.config({
-  cloud_name: "dwtaamxgn",
-  api_key: "431917237583798",
-  api_secret: "LC0J_kCL5lesk7PVP1KviAgHSKY"
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.PHOTO_CLOUD_API_KEY,
+  api_secret: process.env.PHOTO_CLOUD_API_SECRET
 });
 
 /**
