@@ -51,7 +51,7 @@ const _verifyToken = token => jwt.verify(token, process.env.JWT_SECRET);
 const resolvers = {
   Subscription: {
     faceDetected: {
-      subscribe: (_, { data }, { pubsub }) => pubsub.asyncIterator(EMOTION_CHANNEL, data)
+      subscribe: (_, __, { pubsub }) => pubsub.asyncIterator(EMOTION_CHANNEL)
     }
   },
   Mutation: {
@@ -64,6 +64,7 @@ const resolvers = {
      * @since 1.0.0
      */
     async uploadUser(parent, {data}, ) {
+      console.log(data);
       const {createReadStream} = await data.photo;
       const result = await new Promise((resolve, reject) => {
         createReadStream().pipe(
@@ -204,11 +205,12 @@ const resolvers = {
             .then(extractedObj => {
               return Emotion.insertManyEmotion(extractedObj)
             })
-            .then(resolvedEmotions => {
-              return resolvedEmotions.populate("userId");
-              })
+            // .then(resolvedEmotions => {
+            //   return resolvedEmotions.populate("userId");
+            // })
             .then(fetchedEmotions => {
               fetchedEmotions.forEach(emotion => {
+                  emotions.push(emotion)
                   pubsub.publish(EMOTION_CHANNEL, {
                     faceDetected: emotion
                   })
@@ -255,6 +257,9 @@ const resolvers = {
       },
       getAllEmotions (_, __, context) {
       return Emotion.findEmotions({});
+    },
+    emotions (_, __, context) {
+      return emotions;
     },
     /**
      * @function getAllUsers used to pull all the users from the database
@@ -487,6 +492,7 @@ const resolvers = {
          * @since 1.0.0
          */
         async faceLogIn(parent, { data }) {
+            console.log(data)
             try {
                 let str = await faceRecognizer(data);
                 if (!str) {
