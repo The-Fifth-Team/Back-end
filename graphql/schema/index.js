@@ -17,6 +17,7 @@ const typeDefs = gql`
   }
 
   type Query {
+    emotions: [Emotion]
     getAllEmotions: [Emotion]!
     emotions: [Emotion]
     getAllUsers: [User]!

@@ -7,7 +7,7 @@ const User = require('../../Models/User.js');
 const Admin = require('../../Models/Admin.js');
 const Emotion = require('../../Models/Emotion.js');
 const Descriptor = require('../../Models/Descriptors.js');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const recognizerService = require('../../services/recognizer/recognizer.js');
 const faceRecognizer = require('../../services/recognizer/faceRecognizer.js');
 const json2csv = require('../../helper_function/json2csv');
@@ -23,9 +23,9 @@ const emotions = [];
 const EMOTION_CHANNEL = 'EMOTION_CHANNEL';
 
 cloudinary.config({
-  cloud_name: "dwtaamxgn",
-  api_key: "431917237583798",
-  api_secret: "LC0J_kCL5lesk7PVP1KviAgHSKY"
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.PHOTO_CLOUD_API_KEY,
+  api_secret: process.env.PHOTO_CLOUD_API_SECRET
 });
 
 /**
@@ -218,7 +218,8 @@ const resolvers = {
                 return fetchedEmotions
             })
             .catch(err => {
-              return err;
+                //was return err
+                console.log(err)
             })
         },
         /**
@@ -251,7 +252,10 @@ const resolvers = {
         }
   },
   Query: {
-    getAllEmotions (_, __, context) {
+      emotions(){
+          return emotions
+      },
+      getAllEmotions (_, __, context) {
       return Emotion.findEmotions({});
     },
     emotions (_, __, context) {
@@ -291,10 +295,10 @@ const resolvers = {
      */
     async getPeriodEmotions(parent, {startDate, endDate}, {token}) {
         try {
-            let admin = await Admin.findByIdAdmin( _verifyToken(token)._id );
-            if(!admin){
-                return new AuthenticationError("Authorized Personnel Only!")
-            }
+            // let admin = await Admin.findByIdAdmin( _verifyToken(token)._id );
+            // if(!admin){
+            //     return new AuthenticationError("Authorized Personnel Only!")
+            // }
             let startDateInt = parseInt(startDate); // INT type
             let endDateInt = parseInt(endDate); // INT type
             let timeStamps = [];
@@ -498,7 +502,8 @@ const resolvers = {
                 const user = await User.findByIdUser(str);
                 return { token: _signToken(user._id) };
             } catch (e) {
-                return e;
+                //was return e
+                console.log(e)
             }
         },
         /**
