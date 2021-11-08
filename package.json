@@ -19,7 +19,7 @@
     "homepage": "https://github.com/The-Fifth-Team/Back-end#readme",
     "dependencies": {
         "@tensorflow/tfjs-node": "^1.5.2",
-        "apollo-server": "^2.10.0",
+        "apollo-server": "^2.25.3",
         "apollo-server-express": "^2.9.16",
         "bcrypt": "^3.0.8",
         "bcryptjs": "^2.4.3",
@@ -44,6 +44,6 @@
         "validator": "^12.1.0"
     },
     "devDependencies": {
-        "apollo-server": "^2.10.0"
+        "apollo-server": "^2.25.3"
     }
 }
