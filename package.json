@@ -33,7 +33,7 @@
         "faceapi": "^1.0.1",
         "graphql": "^14.5.8",
         "json2csv": "^4.5.4",
-        "jsonwebtoken": "^8.5.1",
+        "jsonwebtoken": "^9.0.0",
         "memcached": "^2.2.2",
         "mocha": "^7.0.0",
         "moment": "^2.24.0",
