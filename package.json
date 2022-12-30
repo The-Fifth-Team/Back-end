@@ -35,7 +35,7 @@
         "json2csv": "^4.5.4",
         "jsonwebtoken": "^8.5.1",
         "memcached": "^2.2.2",
-        "mocha": "^7.0.0",
+        "mocha": "^10.2.0",
         "moment": "^2.24.0",
         "mongoose": "^5.8.9",
         "node-cache": "^5.1.0",
